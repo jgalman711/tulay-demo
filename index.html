@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tulay Marketplace Prototype</title>
+<style>
+/* VOICE work: an app mock-up that should feel shipped, plus a calm plan document
+   IDEA a services directory: search bar on top, filters down the left, one wide result card per provider
+   PICTURE the working marketplace itself, feed and inbox, open mid-use with sample data
+   COLOUR Amihan style sheet: cobalt #243F9B for actions, melon #FFAA73 accents, cloud #DCE8F7 identity, cool page #F4F6F9, ink #19243B
+   TYPE Arial Bold for names and headings, Arial for text
+   LAYOUT white header with search; filters left, results feed right; filters fold behind a button on phones */
+:root{color-scheme:light;--bg:#FFFFFF;--ink:#19243B;--sea:#DCE8F7;--panel:#FFFFFF;--line:#C4CFDF;--hair:#DDE3EC;--mute:#506079;--mag:#243F9B;--brown:#243F9B;--soft:#F4F6F9;--sky:#EAF1FB;--on:#FFFFFF;--good:#22583F;--melon:#FFAA73;--star:#1E9A5B;--rate:#1B7A4A;--font:Arial,Helvetica,sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Overpass,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-weight:800;line-height:1.1;letter-spacing:-.02em;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+.top{background:var(--sea);padding:14px max(4vw,16px) 0}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;max-width:1240px;margin:auto}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand b{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.brand span{font-size:14px;color:var(--mute)}
+.seg{display:flex;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:none;border-radius:999px;padding:8px 14px;min-height:40px;font-weight:600}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.vsel{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute)}
+select,input,textarea{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:16px;min-height:44px;width:100%}
+.vsel select{width:auto}
+textarea{min-height:110px;resize:vertical}
+nav{display:flex;gap:4px;max-width:1240px;margin:12px auto 0;overflow-x:auto}
+nav a{padding:12px 16px;border-radius:12px 12px 0 0;color:var(--ink);text-decoration:none;font-weight:600;white-space:nowrap}
+nav a[aria-current=page]{background:var(--bg)}
+.n{display:inline-block;background:var(--mag);color:var(--on);border-radius:999px;font-size:13px;padding:0 7px;margin-left:6px}
+main{max-width:1240px;margin:auto;padding:24px max(4vw,16px) 64px}
+.cols{display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;align-items:start}
+.legend{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px}
+.legend label,.lbl{font-size:14px;font-weight:600;display:grid;gap:5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;min-height:36px;font-size:14px}
+.chip[aria-pressed=true]{background:var(--brown);border-color:var(--brown);color:var(--on)}
+.opt{background:var(--soft);border-radius:12px;padding:12px;font-size:14px;display:grid;gap:6px}
+.opt label{display:flex;gap:10px;align-items:center;font-size:15px}
+.opt input{width:22px;min-height:22px;accent-color:var(--mag)}
+.muted{color:var(--mute);font-size:14px}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:14px}
+.head h1{font-size:clamp(26px,3.4vw,36px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.who{display:flex;gap:10px;align-items:center}
+.av{flex:none;width:40px;height:40px;border-radius:50%;background:var(--sea);display:grid;place-items:center;font-weight:800;font-size:15px}
+.who b{display:block;line-height:1.2}
+.ok{font-size:13px;color:var(--mute)}
+.ok::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:5px}
+.cat{color:var(--brown);font-size:14px;font-weight:600}
+.card h3{font-size:19px}
+.price{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.price span{white-space:nowrap}
+.desc{margin:0;font-size:15px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.foot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:6px}
+.foot .muted{margin-right:auto}
+.btn{border:0;background:var(--mag);color:var(--on);border-radius:10px;padding:10px 16px;min-height:44px;font-weight:700}
+.btn:disabled{background:var(--line);color:var(--mute);cursor:default}
+.ghost{border:1px solid var(--line);background:none;border-radius:10px;padding:9px 14px;min-height:44px;font-weight:600}
+.ghost[aria-pressed=true]{border-color:var(--mag);color:var(--mag)}
+.ghost.sm{min-height:36px;padding:5px 12px;font-size:14px;background:var(--panel)}
+.empty{border:2px dashed var(--line);border-radius:16px;padding:32px;text-align:center;color:var(--mute)}
+.inbox{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+.tl{display:grid;gap:8px}
+.ti{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:2px}
+.ti[aria-current=true]{border-color:var(--mag);box-shadow:inset 4px 0 0 var(--mag)}
+.ti small{color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:13px;font-weight:600;color:var(--brown)}
+.th{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px}
+.msgs{display:grid;gap:8px}
+.m{max-width:78%;padding:10px 14px;border-radius:14px;background:var(--soft)}
+.m.me{justify-self:end;background:var(--ink);color:var(--bg)}
+.m.sys{justify-self:center;background:none;color:var(--mute);font-size:14px;text-align:center;max-width:90%}
+.note{background:var(--soft);border-radius:12px;padding:12px 14px;font-size:15px;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+form.legend{gap:12px}
+.meter{height:10px;background:var(--soft);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--mag)}
+.mine{display:grid;gap:10px}
+.li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.li b{flex:1 1 220px}
+.stat{font-size:14px;color:var(--mute);white-space:nowrap}
+.sample{font-size:13px;color:var(--mute);margin-top:28px}
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;padding:16px;z-index:9}
+.modal[hidden]{display:none}
+.modal .th{width:min(520px,100%)}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.err{color:var(--mag);font-size:14px;font-weight:600;margin:0}
+/* appointment flow */
+.appt{border:1px solid var(--line);border-left:4px solid var(--mag);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.appt.set{border-left-color:var(--good)}
+.appt>b{font-size:17px}
+.contact{background:var(--sea);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:4px 20px;align-items:baseline}
+.contact .tag{color:var(--ink);flex-basis:100%}
+.proto{border:1px dashed var(--brown);border-radius:12px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--mute)}
+.res{border-radius:12px;padding:12px 14px;display:grid;gap:4px;background:var(--soft);border-left:4px solid var(--brown)}
+.res.good{border-left-color:var(--good)}
+/* analytics */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:24px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:2px;align-content:start}
+.tile b{font-size:32px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.tile span{font-weight:600;font-size:15px}
+.tile small{color:var(--mute);font-size:13px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:24px;display:grid;gap:14px}
+.panel h2{font-size:22px}
+.fun{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fun li{display:grid;grid-template-columns:230px minmax(0,1fr) 92px;gap:12px;align-items:center;padding:4px 0;border-radius:6px}
+.fun li:hover,.fun li:focus{background:var(--soft)}
+.fun .fb{height:22px;display:block}
+.fun .fb i{display:block;height:100%;background:var(--mag);border-radius:0 4px 4px 0;min-width:2px}
+.fun .fn{white-space:nowrap;text-align:right}
+.fun .fn b{font-size:17px}
+.tip{position:fixed;z-index:10;background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:8px;font-size:14px;pointer-events:none;max-width:280px}
+.tip[hidden]{display:none}
+/* calendar + meet */
+.lnk{display:inline-grid;place-items:center;text-decoration:none}
+.ghost.lnk{color:var(--ink)}
+.btn.sm{min-height:36px;padding:5px 12px;font-size:14px}
+.meetl{font-size:15px;overflow-wrap:anywhere}
+.meetl a{color:var(--ink);font-weight:600}
+.prof{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-bottom:16px}
+.av.big{width:56px;height:56px;font-size:20px}
+.pi{flex:1 1 200px;display:grid;gap:2px}.pi h1{font-size:clamp(24px,3vw,32px)}
+.gc{display:grid;gap:4px;justify-items:start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.calwrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:start}
+.calhead{display:flex;align-items:center;gap:12px}.calhead h2{flex:1;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dow{font-size:13px;font-weight:700;color:var(--mute);text-align:center;padding:4px 0}
+.cd{min-height:86px;border:1px solid var(--line);border-radius:8px;padding:4px;display:flex;flex-direction:column;gap:3px}
+.cd.pad{border:0}
+.cd.today{border:2px solid var(--ink)}
+.dn{font-size:13px;color:var(--mute)}
+.cd.today .dn{color:var(--ink);font-weight:800}
+.ce{border:0;border-left:3px solid var(--mag);border-radius:4px;padding:2px 5px;font-size:12px;text-align:left;background:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.ce.set{background:color-mix(in srgb,var(--mag) 16%,var(--panel))}
+.ce.tent{background:none;outline:1px dashed var(--mag);outline-offset:-1px}
+.ce.met{border-left-color:var(--good)}
+.ce.off{border-left-color:var(--line);color:var(--mute)}
+.calkey{gap:6px 16px;font-size:13px}
+.k{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.k.set{background:var(--mag)}.k.tent{border:2px dashed var(--mag)}.k.met{background:var(--good)}.k.off{background:var(--line)}
+.sh{font-size:20px;margin:0 0 10px}.sh+p{margin-top:0}
+.ev{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--mag);border-radius:12px;padding:12px;margin-bottom:10px}
+.ev.tent{border-left-style:dashed}.ev.met{border-left-color:var(--good)}.ev.off{border-left-color:var(--line)}
+.evd{text-align:center;display:grid;align-content:start}.evd b{font-size:24px;font-weight:800;line-height:1.1}.evd span{font-size:13px;color:var(--mute);text-transform:uppercase}
+.evb{display:grid;gap:4px}
+#plan{max-width:860px}
+#plan h1{font-size:clamp(30px,4vw,44px);margin-bottom:12px}
+#plan h2{font-size:24px;margin:40px 0 10px}
+#plan p,#plan li{max-width:70ch}
+.flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;margin:24px 0;background:var(--sea);border-radius:16px;padding:18px}
+.st{position:relative;padding:12px 12px 12px 0}
+.st b{display:block;font-size:16px}
+.st span{font-size:14px;color:var(--mute)}
+.st::before{content:"";display:block;width:16px;height:16px;border-radius:50%;background:var(--mag);border:3px solid var(--panel);margin-bottom:8px;position:relative;z-index:1}
+.st::after{content:"";position:absolute;top:19px;left:8px;right:-8px;height:3px;background:var(--mag)}
+.st:last-child::after{display:none}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:800}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+code{font-size:14px;overflow-wrap:anywhere}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;font-size:14px}
+@media(max-width:860px){.cols,.inbox,.two,.calwrap{grid-template-columns:minmax(0,1fr)}.flow{grid-template-columns:minmax(0,1fr)}.st{padding-left:30px}.st::before{position:absolute;left:0;top:14px}.st::after{left:7px;top:30px;bottom:-14px;right:auto;width:3px;height:auto}}
+@media(max-width:600px){table{font-size:13px}th,td{padding:6px 4px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{border:0;padding:2px 0}.stack td.num{text-align:left}.stack td::before{content:attr(data-l) ": ";font-weight:700}.brand span{display:none}.seg button{padding:6px 10px;font-size:14px;min-height:36px}.cd{min-height:46px;flex-flow:row wrap;justify-content:center;align-content:flex-start;padding:3px}.dn{width:100%;text-align:center}.ce{width:9px;height:9px;padding:0;border:0;border-radius:50%;background:var(--mag)}.ce span{display:none}.ce.set{background:var(--mag)}.ce.tent{background:none;outline:1.5px dashed var(--mag)}.ce.met{background:var(--good)}.ce.off{background:var(--mute)}.fun li{grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}.fun .fb{grid-column:1/-1;grid-row:2}}
+@media(prefers-reduced-motion:no-preference){.card,.ti{transition:border-color .15s}}
+/* ---------- Amihan restyle ---------- */
+body{font:16px/1.5 var(--font);background:var(--bg)}
+h1,h2,h3{font-weight:700;letter-spacing:-.035em}
+select,input,textarea{border-radius:6px;border-color:var(--line)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.top{background:#fff;border-bottom:1px solid var(--hair);padding:0 max(3vw,16px)}
+.bar{max-width:1320px;min-height:68px;padding:10px 0;gap:10px 18px}
+.brand{margin-right:0;gap:8px;color:var(--mag);text-decoration:none}
+.brand b{font-size:28px;font-weight:700;letter-spacing:-.075em;line-height:1}
+.mark{position:relative;width:32px;height:22px;display:inline-block;flex:none}
+.mark::before,.mark::after{content:"";box-sizing:border-box;position:absolute;width:17px;height:14px;top:4px;border:3px solid currentColor;border-bottom:0;border-radius:100% 100% 0 0;transform:skewX(-12deg)}
+.mark::before{left:1px}.mark::after{left:15px}
+.search{flex:1 1 420px;max-width:660px;display:flex;align-items:stretch;border:1px solid var(--line);border-radius:6px;background:#fff;box-shadow:0 1px 4px #19243b14;overflow:hidden}
+.search input,.search select{border:0;border-radius:0;min-height:46px;background:transparent;width:100%}
+.search input{flex:1 1 auto;font-weight:700;padding-left:16px}
+.search input:focus-visible,.search select:focus-visible{outline-offset:-3px}
+.loc{display:flex;align-items:center;gap:2px;border-left:1px solid var(--hair);padding-left:12px;flex:0 1 200px;color:var(--mute)}
+.loc svg{width:18px;height:18px;flex:none}
+.loc select{font-weight:700;padding-left:4px;color:var(--ink)}
+.search button{border:0;background:var(--mag);color:#fff;width:58px;flex:none;display:grid;place-items:center}
+.right{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-left:auto}
+.vsel select{min-height:40px;font-size:14px}
+.seg{border-radius:6px;padding:3px;background:var(--soft);border-color:var(--hair)}
+.seg button{border-radius:4px;min-height:36px;padding:6px 12px;font-size:14px}
+.seg button[aria-pressed=true]{background:var(--mag);color:#fff}
+nav{max-width:1320px;margin:0 auto;gap:24px}
+nav a{padding:10px 0 11px;border-radius:0;border-bottom:3px solid transparent;font-size:15px;color:var(--mute)}
+nav a:hover{color:var(--ink)}
+nav a[aria-current=page]{background:none;color:var(--mag);border-bottom-color:var(--mag)}
+.n{background:var(--melon);color:var(--ink);font-weight:700}
+main{max-width:1320px;padding:28px max(3vw,16px) 64px}
+.btn{border-radius:6px;font-weight:700}
+.ghost{border-radius:6px;border-color:#8794a7;background:#fff}
+.ghost[aria-pressed=true]{border-color:var(--mag);color:var(--mag);background:var(--sky)}
+.card,.legend,.th,.panel,.tile,.li,.ti,.gc,.ev{border-radius:12px;border-color:var(--line)}
+.chip{border-radius:6px;background:#fff}
+.chip[aria-pressed=true]{background:var(--mag);border-color:var(--mag);color:#fff}
+.ok::before{background:#2E9E62}
+.err{color:#8D372E}
+.flow{background:var(--sky)}
+.res.good{background:#E3F0E8;border-left-color:var(--good)}
+.m.me{background:var(--mag);color:#fff}
+.av{background:var(--sea);color:var(--mag)}
+/* results feed */
+.tt{display:grid;grid-template-columns:250px minmax(0,1fr);gap:0 clamp(24px,4vw,56px);align-items:start}
+.side{border-right:1px solid var(--hair);padding:2px 24px 24px 0;position:sticky;top:12px;display:grid;gap:22px;max-height:calc(100vh - 24px);overflow:auto}
+.side h2{font-size:21px}
+.side fieldset{border:0;margin:0;padding:0;display:grid}
+.side legend{font-weight:700;font-size:15px;padding:0;margin-bottom:6px}
+.side label{display:flex;align-items:center;gap:10px;font-size:15px;min-height:32px;cursor:pointer}
+.side input{width:18px;height:18px;min-height:0;margin:0;accent-color:var(--mag);flex:none}
+.optbox{background:var(--soft);border-radius:12px;padding:12px;display:grid;gap:6px;font-size:14px}
+.optbox label{font-weight:700;align-items:flex-start}
+.fbtn{display:none}
+.feedcol{max-width:880px}
+.res-head h1{font-size:clamp(24px,2.6vw,30px)}
+.crit-row{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin-top:4px}
+.crit{border:0;background:none;padding:0;color:var(--mute);font-size:14px;display:inline-flex;gap:6px;align-items:center;min-height:28px}
+.crit i{width:16px;height:16px;border:1.5px solid currentColor;border-radius:50%;display:grid;place-items:center;font:700 11px/1 var(--font);font-style:normal}
+.top4{display:flex;align-items:center;gap:16px 20px;flex-wrap:wrap;background:var(--sky);border-radius:12px;padding:20px 24px;margin:20px 0 28px}
+.avs{display:flex;flex:none}
+.avs .av{width:54px;height:54px;border:3px solid #fff;margin-left:-14px;font-size:16px}
+.avs .av:first-child{margin-left:0}
+.top4 .t{flex:1 1 260px;display:grid;gap:2px}
+.top4 b{font-size:19px;letter-spacing:-.02em}
+.top4 span{font-size:15px}
+.top4 .btn{min-height:46px;padding-inline:22px}
+.pros{display:grid;gap:24px}
+.pro{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px 24px;background:#fff;border:1px solid var(--hair);border-radius:12px;padding:28px 24px;box-shadow:0 2px 10px #19243b14}
+.big{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;font:700 40px/1 var(--font);letter-spacing:-.03em;justify-self:center}
+.c0{background:var(--sea);color:var(--mag)}.c1{background:#FFE3D1;color:var(--ink)}.c2{background:var(--mag);color:#fff}
+.pro h3{font-size:19px;letter-spacing:-.02em}
+.rate{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:15px;margin-top:3px}
+.rate b{color:var(--rate)}
+.stars{--p:100%;letter-spacing:1px;background:linear-gradient(90deg,var(--star) var(--p),var(--line) var(--p));-webkit-background-clip:text;background-clip:text;color:transparent}
+.topb{display:inline-flex;align-items:center;gap:6px;margin-right:4px}
+.topb i{width:20px;height:20px;border-radius:50%;background:var(--melon);color:var(--ink);display:grid;place-items:center;font-size:12px;font-style:normal}
+.lt{font-weight:700;font-size:15px;margin:10px 0 0}
+.ld{margin:2px 0 0;font-size:14px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.pill{background:var(--sky);color:var(--mag);border-radius:999px;padding:3px 10px;font:700 13px/1.4 var(--font);white-space:nowrap}
+.pill.c{background:var(--soft);color:var(--ink);font-weight:400}
+.facts{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:4px;font-size:15px}
+.facts li{display:flex;align-items:center;gap:10px}
+.facts svg{width:18px;height:18px;flex:none}
+.dot{width:12px;height:12px;border-radius:50%;background:#2E9E62;box-shadow:0 0 0 3px #2E9E6233;margin:0 3px;flex:none}
+.dot.off{background:#A9B4C4;box-shadow:none}
+.pro-foot{grid-column:2;display:flex;gap:16px 24px;align-items:center;flex-wrap:wrap}
+.quote{flex:1 1 300px;background:var(--soft);border:1px solid var(--hair);border-radius:6px;padding:10px 12px;font-size:15px;margin:0;color:var(--mute)}
+.quote .q{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.quote.open .q{display:block}
+.quote button{border:0;background:none;padding:2px 0;color:var(--mag);font-weight:700;font-size:14px}
+.acts{display:flex;gap:8px;align-items:center;margin-left:auto}
+.acts .btn{min-width:150px;min-height:46px}
+@media(max-width:860px){.tt{grid-template-columns:minmax(0,1fr)}.side{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--hair);padding:0 0 20px;margin-bottom:16px;display:none}.side.open{display:grid}.fbtn{display:inline-flex;align-items:center;justify-self:start;margin-bottom:14px}}
+@media(max-width:700px){.search{order:3;flex-basis:100%;max-width:none}.loc{flex-basis:150px}.right{margin-left:auto}nav{gap:18px}}
+@media(max-width:600px){.pro{grid-template-columns:72px minmax(0,1fr);padding:20px 16px;gap:14px}.big{width:72px;height:72px;font-size:24px}.pro-foot{grid-column:1/-1}.acts{margin-left:0;width:100%}.acts .btn{flex:1}.top4{padding:16px}}
+.plink{border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;letter-spacing:inherit}
+.plink:hover{color:var(--mag);text-decoration:underline;text-underline-offset:3px}
+button.big{border:0;padding:0;cursor:pointer}
+.back{margin-bottom:18px}
+.pf{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:clamp(24px,4vw,48px);align-items:start}
+.pf-top{display:grid;grid-template-columns:132px minmax(0,1fr);gap:24px;align-items:center;padding-bottom:24px;border-bottom:1px solid var(--hair)}
+.pf-top h1{font-size:clamp(26px,3vw,34px)}
+.pf-mob{display:none;margin-top:14px}
+.pf-sec{padding:24px 0;border-bottom:1px solid var(--hair)}
+.pf-sec h2{font-size:21px;margin-bottom:12px}
+.pf-sec>p{max-width:68ch;margin:0}
+.pf-dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px 24px;margin:18px 0 0}
+.pf-dl dt{font-size:13px;color:var(--mute)}
+.pf-dl dd{margin:0;font-weight:700;font-size:15px}
+.pf-ls{display:grid;gap:12px}
+.pl{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;border:1px solid var(--hair);border-radius:12px;padding:16px 18px}
+.pl>div:first-child{flex:1 1 320px;display:grid;gap:5px;justify-items:start}
+.pl h3{font-size:17px;letter-spacing:-.02em}
+.pl p{margin:0;font-size:14px}
+.pl-m{font-size:14px;color:var(--mute)}.pl-m b{color:var(--ink)}
+.pl-a{display:flex;gap:8px}
+.rv-sum{display:flex;flex-wrap:wrap;gap:16px 36px;align-items:center;margin-bottom:12px}
+.rv-big{display:grid;justify-items:start;gap:2px}
+.rv-big b{font-size:44px;line-height:1;color:var(--rate);letter-spacing:-.03em}
+.rv-bars{flex:1 1 240px;display:grid;gap:4px;max-width:360px}
+.rv-bars div{display:grid;grid-template-columns:34px minmax(0,1fr) 28px;gap:8px;align-items:center;font-size:14px}
+.rv-l{list-style:none;margin:16px 0 0;padding:0;display:grid}
+.rv-l li{padding:16px 0;border-top:1px solid var(--hair);display:grid;gap:4px}
+.rv-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:15px}
+.rv-l p{margin:0;max-width:70ch}
+.vtag{font-size:13px;color:var(--good);font-weight:700}
+.pf-side{position:sticky;top:16px}
+.pf-card{border:1px solid var(--hair);border-radius:12px;padding:20px;box-shadow:0 2px 10px #19243b14;display:grid;gap:10px;font-size:15px}
+.pf-price{font-size:28px;letter-spacing:-.02em;line-height:1.1}
+.pf-card .btn{width:100%;min-height:48px}
+@media(max-width:860px){.pf{grid-template-columns:minmax(0,1fr)}.pf-side{display:none}.pf-mob{display:block}}
+@media(max-width:600px){.pf-top{grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:start}.pf-top .big{width:72px;height:72px;font-size:24px}.pf-mob .btn{width:100%}}
+.crown{width:44px;height:44px;border-radius:6px;border:1px solid var(--hair);background:var(--soft);color:var(--mute);display:grid;place-items:center;flex:none}
+.crown:hover{color:var(--ink)}
+.crown svg{width:22px;height:22px}
+.crown[aria-pressed=true]{background:var(--melon);border-color:var(--melon);color:var(--ink)}
+.blur{filter:blur(5px);user-select:none;display:inline-block;padding:0 3px;font-weight:700}
+.lock{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--melon);color:var(--ink);vertical-align:middle;margin-left:4px}
+.facts .lock svg{width:13px;height:13px}
+.dem{border:1px solid var(--hair);border-radius:12px;padding:20px 24px;margin:20px 0 28px;background:linear-gradient(135deg,var(--sky),#fff 75%)}
+.dem-h{display:flex;gap:14px;align-items:flex-start}
+.dem-i{width:44px;height:44px;border-radius:50%;background:var(--melon);color:var(--ink);display:grid;place-items:center;flex:none}
+.dem-i svg{width:24px;height:24px}
+.kick{font-size:14px;font-weight:700;color:var(--mag)}
+.dem h2{font-size:clamp(20px,2.2vw,24px);margin:2px 0 4px;text-wrap:balance}
+.dem p{margin:0;font-size:14px}
+.dem-l{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:2px 24px}
+.dem-l button{width:100%;display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr) 30px 50px;gap:10px;align-items:center;border:0;background:none;padding:6px;border-radius:6px;text-align:left;font-size:14px;min-height:36px}
+.dem-l button:hover,.dem-l button[aria-pressed=true]{background:#fff;box-shadow:0 0 0 1px var(--line)}
+.dem-l button[aria-pressed=true]{font-weight:700}
+.db{height:10px;background:#fff;border-radius:99px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--hair)}
+.db i{display:block;height:100%;background:var(--mag);border-radius:99px}
+.dv,.dc{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.dc.up{color:var(--rate)}.dc.down{color:var(--mute)}
+.ins{display:flex;gap:14px;align-items:flex-start;background:var(--sky);border-radius:12px;padding:18px 22px}
+.ins b{font-size:17px;display:block;letter-spacing:-.01em}
+.ins p{margin:2px 0 10px;font-size:15px;color:var(--mute)}
+.lay{display:flex;gap:2px;padding:3px;background:var(--soft);border:1px solid var(--hair);border-radius:6px}
+.lay button{width:42px;height:38px;border:0;border-radius:4px;background:none;color:var(--mute);display:grid;place-items:center}
+.lay button:hover{color:var(--ink)}
+.lay button[aria-pressed=true]{background:#fff;color:var(--mag);box-shadow:0 1px 3px #19243b2e}
+.lay svg{width:20px;height:20px}
+.feedcol.wide{max-width:none}
+.pros.g{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.pros.g .pro{grid-template-columns:72px minmax(0,1fr);grid-template-rows:auto 1fr;padding:20px;gap:14px}
+.pros.g .big{width:72px;height:72px;font-size:24px}
+.pros.g .pro-foot{grid-column:1/-1;align-self:end}
+.pros.g .acts{margin-left:0;width:100%}
+.pros.g .acts .btn{flex:1;min-width:0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="#" aria-label="Tulay home"><i class="mark" aria-hidden="true"></i><b>Tulay</b></a>
+    <form class="search" id="sbar" role="search" hidden><label class="sr" for="q">What do you need help with?</label><input id="q" type="search" autocomplete="off"><span class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><label class="sr" for="city">Your location</label><select id="city"></select></span><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></button></form>
+    <div class="right"><div class="lay" id="lay" role="group" aria-label="Results layout" hidden><button type="button" data-act="lay" data-v="list" aria-label="List view" title="List view" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3.2"/></svg></button><button type="button" data-act="lay" data-v="grid" aria-label="Grid view" title="Grid view" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg></button></div>
+    <div class="seg" id="roles" role="group" aria-label="View as"></div><button type="button" class="crown" data-act="prem" aria-pressed="false" aria-label="Premium view" title="Premium view"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 8l4.6 3.6L12 5l4.4 6.6L21 8l-1.8 9.5H4.8z"/><rect x="4.8" y="18.7" width="14.4" height="2" rx="1"/></svg></button></div>
+  </div>
+  <nav id="tabs" aria-label="Sections"></nav>
+</header>
+<main><div id="view"></div>
+
+<section id="plan" hidden>
+<h1>Plan: a user-to-user marketplace, financial advisors first</h1>
+<p><strong>Build a Facebook Marketplace–style app for one vertical, financial advisors in the Philippines.</strong> Advisors post listings, the listings form a location-based feed, and clients either message a listing or opt in to be contacted. Phone numbers are only shared once both sides agree on a meeting time, and after the meeting both are asked whether it happened. That way every successful appointment is recorded. Everything vertical-specific (labels, categories, credentials, listing fields) lives in a config row, so a second vertical is new data, not new code.</p>
+
+<div class="flow" aria-label="How a connection happens">
+  <div class="st"><b>Verified</b><span>Our team checks the license (provider) or screens the client</span></div>
+  <div class="st"><b>Listing posted</b><span>Category, price, city, description</span></div>
+  <div class="st"><b>Feed</b><span>Ranked by distance and recency only</span></div>
+  <div class="st"><b>Conversation</b><span>Inquiry or opt-in outreach; numbers hidden in chat</span></div>
+  <div class="st"><b>Meeting set</b><span>Google Calendar invite with a Meet link; numbers shared</span></div>
+  <div class="st"><b>Met</b><span>Meet shows both joined, or both say so at check-in</span></div>
+</div>
+
+<h2>The core stays neutral; the vertical is data</h2>
+<p>No table or column names a profession. "Advisor" and "client" are labels the vertical config supplies to the UI.</p>
+<div class="scroll"><table class="stack">
+<thead><tr><th>Table</th><th>Purpose</th><th>Key fields</th></tr></thead>
+<tbody>
+<tr><td data-l="Table"><code>verticals</code></td><td data-l="Purpose">One row per marketplace (financial advisors, dentists…)</td><td data-l="Key fields">slug, provider/seeker labels, categories, listing field schema, credential rule, is_active</td></tr>
+<tr><td data-l="Table"><code>users</code></td><td data-l="Purpose">A person, independent of any vertical</td><td data-l="Key fields">name, mobile, email, city, location (lat/lng)</td></tr>
+<tr><td data-l="Table"><code>memberships</code></td><td data-l="Purpose">A user's role inside one vertical, so one person can be a provider in one vertical and a seeker in another</td><td data-l="Key fields">user_id, vertical_id, role (provider | seeker), verification_status, screened_at, open_to_contact</td></tr>
+<tr><td data-l="Table"><code>listings</code></td><td data-l="Purpose">What a provider offers; the feed is just listings</td><td data-l="Key fields">vertical_id, owner_id, category, title, body, price, price_unit, location, attributes (JSON from the schema), status (live | paused | removed)</td></tr>
+<tr><td data-l="Table"><code>threads</code></td><td data-l="Purpose">One conversation between two users</td><td data-l="Key fields">vertical_id, provider_id, seeker_id, listing_id (nullable), kind (inquiry | outreach), status (pending | open | declined | reported), contact_unlocked_at</td></tr>
+<tr><td data-l="Table"><code>messages</code></td><td data-l="Purpose">Text inside a thread; numbers and emails masked until contact_unlocked_at is set</td><td data-l="Key fields">thread_id, sender_id, body, kind (text | system), was_masked</td></tr>
+<tr><td data-l="Table"><code>appointments</code></td><td data-l="Purpose">A meeting proposed inside a thread; accepting one unlocks contact</td><td data-l="Key fields">thread_id, proposed_by, starts_at, mode (online | in person | phone), place, duration_min, status (proposed | confirmed | declined | cancelled | done), confirmed_at, outcome (met | missed | disputed), calendar_event_id, meet_link, provider_joined_at, seeker_joined_at</td></tr>
+<tr><td data-l="Table"><code>checkins</code></td><td data-l="Purpose">Each side's answer after the meeting, plus the client's follow-up</td><td data-l="Key fields">appointment_id, user_id, source (meet_attendance | self_report), answer (met | no_show | rescheduled), answered_at, satisfaction (yes | partly | no, client only)</td></tr>
+<tr><td data-l="Table"><code>events</code></td><td data-l="Purpose">Funnel events for analytics; never read by ranking</td><td data-l="Key fields">user_id, thread_id, name (listing_view, message_sent, first_reply, meeting_proposed, meeting_set, checkin, feedback), at</td></tr>
+<tr><td data-l="Table"><code>reports</code>, <code>blocks</code></td><td data-l="Purpose">Moderation for listings, users and threads</td><td data-l="Key fields">reporter_id, target_type, target_id, reason, resolved_by</td></tr>
+<tr><td data-l="Table"><code>subscriptions</code></td><td data-l="Purpose">Provider plan; never read by ranking</td><td data-l="Key fields">user_id, plan, period_end, outreach_used</td></tr>
+</tbody></table></div>
+
+<p>An example vertical config (JSON), using the financial-advisor vertical:</p>
+<pre><code>{
+  "slug": "financial-advisors",
+  "labels": { "provider": "Advisor", "seeker": "Client" },
+  "categories": ["Life insurance", "VUL", "Health / HMO", "Retirement",
+                 "Education plan", "Investments", "Debt &amp; budgeting"],
+  "credential": { "name": "Insurance Commission or SEC registration", "required": true },
+  "listing_fields": [
+    { "key": "price", "type": "money", "unit": "/mo", "label": "Starting premium" },
+    { "key": "mode", "type": "choice", "options": ["Online", "In person", "Both"] }
+  ],
+  "advisors_per_request": 5,
+  "followup_question": "Did you get the help you needed?"
+}</code></pre>
+<p>This demo runs only the financial-advisor vertical. Adding dentists, home repairs or kasambahay later means adding another config row like this one, not new screens.</p>
+
+<h2>Appointments and how success is measured</h2>
+<p><strong>A successful appointment is one where both sides say they met.</strong> One person's word isn't enough, so neither side can inflate the numbers.</p>
+<div class="scroll"><table class="stack">
+<thead><tr><th>Step</th><th>What happens</th><th>What it records</th></tr></thead>
+<tbody>
+<tr><td data-l="Step">Propose</td><td data-l="What happens">Either side picks a date, time and mode in the thread. The other accepts, suggests another time or declines.</td><td data-l="What it records">meeting_proposed</td></tr>
+<tr><td data-l="Step">Meeting set</td><td data-l="What happens">On accept, both numbers appear in the thread, and both get a Google Calendar invite (with a Google Meet link for online meetings). Before this, numbers and emails typed in chat are hidden.</td><td data-l="What it records">meeting_set, contact_unlocked_at, calendar_event_id</td></tr>
+<tr><td data-l="Step">Check-in</td><td data-l="What happens">For Google Meet meetings, Tulay reads who joined. If both did, it counts as met with no questions. Otherwise, and for in-person meetings, both get asked a few hours later: met, no-show, or rescheduled.</td><td data-l="What it records">Both "met" = success. Met vs no-show = disputed, goes to review. Rescheduled = propose a new time.</td></tr>
+<tr><td data-l="Step">Follow-up</td><td data-l="What happens">Two weeks later the client is asked if they got the help they needed. It doesn't ask whether they bought anything.</td><td data-l="What it records">satisfaction; unlocks a review</td></tr>
+</tbody></table></div>
+<p>Main number to watch: <strong>appointments both sides confirmed, per week, per city.</strong> Supporting numbers: first-reply time, share of inquiries answered within 24 hours, proposal-to-meeting rate, no-show and dispute rate, outreach acceptance rate, and the follow-up "yes" rate. Advisors see their own numbers; the Tulay team sees the whole marketplace. Switch to <strong>Admin view</strong> at the top to try it.</p>
+
+<h2>Google Meet and calendars</h2>
+<ul>
+<li><strong>One organizer account.</strong> A Tulay Google Workspace account owns every event. When a meeting is accepted, the server creates a Google Calendar event with both people as guests and asks Google to attach a Meet link (Calendar API <code>events.insert</code> with <code>conferenceData.createRequest</code> and <code>conferenceDataVersion=1</code>). Google emails the invite, so it lands in both people's calendars. Nobody has to connect their own Google account.</li>
+<li><strong>Changes follow.</strong> Rescheduling updates the same event and cancelling deletes it, with updates sent to guests, so calendars never show stale meetings.</li>
+<li><strong>In-app calendar.</strong> Each profile has a "My calendar" page built from Tulay's own appointments table, with "Join Google Meet" and "Open in Google Calendar" on each meeting. Past meetings stay listed as the record.</li>
+<li><strong>Attendance from Meet.</strong> After the meeting, the server reads the Meet REST API's conference record and participants to see who joined and when. Google deletes these records 30 days after the meeting, so save the join times right away. Only people signed in to Google show up by name, so anyone who joined anonymously falls back to the check-in.</li>
+<li><strong>Privacy.</strong> Set <code>guestsCanSeeOtherGuests</code> to false if guests shouldn't see each other's email. Don't record meetings by default; recording a financial conversation needs both people's consent.</li>
+<li><strong>Later:</strong> let people optionally connect their Google Calendar so Tulay can suggest times when both are free.</li>
+</ul>
+
+<h2>Rules that keep it fair for clients</h2>
+<ul>
+<li><strong>Ranking never reads the subscription or the analytics.</strong> The feed only filters (category, radius, keyword) and sorts by distance or recency. There's no boosted or sponsored slot.</li>
+<li><strong>Numbers stay hidden until a meeting is set.</strong> Nobody's number leaves the app until both people have agreed on a time.</li>
+<li><strong>Clients are free, always.</strong> Only providers pay, and during the beta nobody does.</li>
+<li><strong>Reaching out is free, and each request has a limit.</strong> Advisors don't pay per reach-out. Up to 5 advisors can answer each client request, and a client who declines blocks that advisor. Paid plans never buy ranking or extra slots.</li>
+<li><strong>Outreach is opt-in.</strong> Advisors can only contact screened clients who turned on "open to contact". The advisor sees a first name, the city and the client's interests, never a number. The first message stays pending until the client accepts. Declining blocks that advisor.</li>
+<li><strong>Listings are moderated.</strong> No guaranteed returns, no recruitment ("be your own boss") posts, and a disclaimer on every financial listing. Reports and disputed check-ins go to an admin queue.</li>
+</ul>
+
+<h2>Build in three phases</h2>
+<div class="scroll"><table class="stack">
+<thead><tr><th>Phase</th><th>Scope</th><th>Done when</th></tr></thead>
+<tbody>
+<tr><td data-l="Phase">0. Research (now)</td><td data-l="Scope">Interviews with advisors and potential clients; seed list of advisors from your friend's network</td><td data-l="Done when">Enough advisors committed to fill one city's feed</td></tr>
+<tr><td data-l="Phase">1. MVP</td><td data-l="Scope">Sign-up, license check and client screening queue (admin), listings, location feed and search, inquiry messaging with number masking, opt-in outreach with cap, meeting proposals with contact unlock, Google Calendar invites with Meet links, My calendar page, two-sided check-in, report and block, basic admin funnel</td><td data-l="Done when">A client in one city can find an advisor, set a meeting, and both confirm they met</td></tr>
+<tr><td data-l="Phase">2. Retention</td><td data-l="Scope">Meet attendance auto-confirm, push and SMS reminders before meetings and for check-ins, client follow-up, advisor analytics, saved listings, subscription billing (GCash/Maya through a PH payment gateway)</td><td data-l="Done when">Most meetings get both check-ins answered, and advisors renew without being chased</td></tr>
+<tr><td data-l="Phase">3. Second vertical</td><td data-l="Scope">New config row, its credential check, its own seed providers</td><td data-l="Done when">No schema changes needed</td></tr>
+</tbody></table></div>
+<p><strong>Suggested stack:</strong> Postgres with PostGIS for distance queries, a TypeScript web app (Next.js), and a hosted realtime service for messaging. Supabase covers Postgres, auth, realtime and storage in one, which suits a small team. Google Calendar and Meet REST APIs through one Workspace service account. A scheduled job reads Meet attendance and sends check-ins a few hours after each meeting's start time.</p>
+
+<h2>Compliance to settle before launch</h2>
+<ul>
+<li>Data Privacy Act (RA 10173): a privacy notice, a consent record for "open to contact" and for sharing numbers and emails (in the calendar invite) when a meeting is set, data-retention rules, and registration with the National Privacy Commission (NPC) if you meet its thresholds.</li>
+<li>Check-in answers and follow-up feedback are personal data: say so in the privacy notice and keep them only as long as the metrics need.</li>
+<li>Credential checks per vertical: Insurance Commission or SEC for advisors, PRC for dentists, NBI clearance for kasambahay. Store the evidence and the date checked.</li>
+<li>Terms that say the platform connects people and isn't a party to the advice or contract.</li>
+</ul>
+
+<h2>Noted for later</h2>
+<ul>
+<li>One person in both roles: the membership table already allows it; the UI needs a role switcher like this prototype's.</li>
+<li>Reviews: only after both sides confirmed they met, to limit fake reviews.</li>
+<li>Verification at scale: manual checks are fine for the first hundreds; look at document upload plus spot checks after that.</li>
+<li>Advisor feed posts that aren't listings (tips, updates): same table with a <code>kind</code> column, once moderation is in place.</li>
+</ul>
+
+<h2>Open questions</h2>
+<ul>
+<li>What does client screening check: identity, intent, both? It decides what sign-up asks for.</li>
+<li>Which city do you launch in? A feed ranked by distance needs density in one place first.</li>
+<li>Does an advisor's company (insurer or fund house) appear on listings? It helps trust but brings brand-use rules.</li>
+<li>What happens after repeated no-shows? For example, a warning after two and a pause on messaging after three.</li>
+<li>How should disputed check-ins be settled: ask both for details, or just track the pattern per user?</li>
+</ul>
+</section></main>
+
+<div class="modal" id="modal" hidden><div class="th" role="dialog" aria-modal="true" aria-labelledby="mt">
+  <h2 id="mt" style="font-size:22px"></h2>
+  <p class="muted" id="mnote" style="margin:0"></p>
+  <label class="lbl" for="mtext">Message<textarea id="mtext"></textarea></label>
+  <p class="muted" style="margin:0">Phone numbers and emails are hidden until you both agree on a meeting.</p>
+  <div class="row"><button class="btn" data-act="msend">Send</button><button class="ghost" data-act="mclose">Cancel</button></div>
+</div></div>
+
+<div class="modal" id="amodal" hidden><form class="th" id="af" role="dialog" aria-modal="true" aria-labelledby="at" novalidate>
+  <h2 id="at" style="font-size:22px">Propose a meeting</h2>
+  <p class="muted" id="anote" style="margin:0"></p>
+  <div class="pair"><label class="lbl" for="adate">Date<input id="adate" type="date"></label><label class="lbl" for="atime">Time<input id="atime" type="time" step="900"></label></div>
+  <div class="pair"><label class="lbl" for="amode">How<select id="amode"><option>Google Meet</option><option>In person</option></select></label><label class="lbl" for="adur">Length<select id="adur"><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option></select></label></div>
+  <p class="note" id="ameet" style="font-size:14px">Tulay creates the Google Meet link and adds the meeting to both your Google Calendars once it's accepted.</p>
+  <label class="lbl" for="awhere" id="awrap" hidden>Place<input id="awhere" maxlength="80" placeholder="Café or office name"></label>
+  <p class="muted" style="margin:0">Your numbers are shared with each other only once you both agree on this.</p>
+  <p class="err" id="aerr" role="alert"></p>
+  <div class="row"><button class="btn" type="submit">Send proposal</button><button class="ghost" type="button" data-act="aclose">Cancel</button></div>
+</form></div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+{
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+const CITIES={'Quezon City':[14.676,121.044],'Manila':[14.599,120.984],'Makati':[14.554,121.024],'Taguig':[14.551,121.05],'Pasig':[14.576,121.085],'Mandaluyong':[14.579,121.036],'Cebu City':[10.316,123.885],'Iloilo City':[10.72,122.562],'Davao City':[7.19,125.455]};
+const km=(a,b)=>{const [x,y]=CITIES[a],[p,q]=CITIES[b],r=Math.PI/180,d=Math.sin((p-x)*r/2)**2+Math.cos(x*r)*Math.cos(p*r)*Math.sin((q-y)*r/2)**2;return 12742*Math.asin(Math.sqrt(d))};
+const CAP=10;
+const NOW=new Date();
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const nextSat=()=>(6-NOW.getDay()+7)%7||7;
+const dayAt=(inDays,hour)=>{const d=new Date(NOW);d.setDate(d.getDate()+(inDays==='sat'?nextSat():inDays));d.setHours(hour,0,0,0);return d};
+const fmtWhen=d=>d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+', '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+const phone=n=>{let h=7;for(const c of n)h=(h*31+c.charCodeAt(0))>>>0;return `0917 ${h%900+100} ${(h>>>11)%9000+1000}`};
+const PHONE=/(?:\+?63|0)[\s.-]?9\d{2}[\s.-]?\d{3}[\s.-]?\d{4}|\b\d(?:[\s.-]?\d){9,11}\b/g;
+const EMAIL=/[\w.+-]+@[\w-]+\.[\w.-]+/g;
+const mask=s=>s.replace(PHONE,'[number hidden]').replace(EMAIL,'[email hidden]');
+const meetCode=s=>{let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619)>>>0;let o='';for(let i=0;i<10;i++){o+=String.fromCharCode(97+h%26);h=(Math.imul(h,1103515245)+12345)>>>0}return o.slice(0,3)+'-'+o.slice(3,7)+'-'+o.slice(7)};
+const meetUrl=a=>'https://meet.google.com/'+a.meet;
+const tm=d=>d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+const gdt=d=>d.toISOString().replace(/[-:]|\.\d{3}/g,'');
+const email=n=>n.replace(/^Dr\. /,'').toLowerCase().replace(/[^a-z ]/g,'').trim().split(/\s+/).join('.')+'@example.com';
+const L=(by,yrs,cat,title,price,city,desc,h,views,unit)=>({by,yrs,cat,title,price,city,desc,h,views,unit});
+const V={
+finance:{name:'Financial advisors',provider:'Advisor',providers:'Advisors',seeker:'Client',seekers:'Clients',cred:'License verified',unit:'/mo',from:'from ',
+ cats:['Life insurance','VUL','Health / HMO','Retirement','Education plan','Investments','Debt & budgeting'],
+ listings:[
+  L('Marissa D. Villanueva',9,'Retirement','Retirement plan review for employees 35 to 50',3000,'Quezon City',"I'll map your SSS and Pag-IBIG benefits, find the gap, and show you two or three ways to close it. First consultation is free, online or in QC.",5,214),
+  L('Paolo R. Mendoza',6,'Health / HMO','Health cover for freelancers without a company HMO',1200,'Makati','Compare HMO cards and critical illness riders side by side. I explain waiting periods and exclusions before you sign anything.',2,96),
+  L('Grace T. Lim',12,'Investments','Starting out with UITFs and mutual funds',1000,'Taguig','For first-time investors putting in ₱1,000 to ₱10,000 a month. We set a goal, pick a risk level, and I walk you through opening the account.',20,340),
+  L('Ramon C. Aquino',4,'Life insurance','Term life for young families',900,'Pasig',"Pure protection with no investment part. We'll work out how much cover your family actually needs, then compare a few quotes.",8,71),
+  L('Liza M. Fernandez',15,'VUL','VUL second opinion: keep, reduce or surrender?',0,'Mandaluyong','Bring your policy contract. We read the charges, fund performance and surrender value together. No selling in this session.',48,402),
+  L('Marissa D. Villanueva',9,'Education plan','Education fund for kids starting school before 2032',2500,'Quezon City','Plan backwards from tuition: target amount, monthly saving, and whether insurance, a fund or both makes sense for your timeline.',30,118),
+  L('Arnel P. Castro',7,'Debt & budgeting','Budget and debt plan for OFW families',1500,'Manila','Remittance budgeting, paying down cards and loans, and an emergency fund before any insurance.',72,153),
+  L('Kristine B. Ong',10,'Retirement','Retirement planning for small business owners',3500,'Cebu City','Separate business and personal money, then build a retirement fund that survives a bad sales year.',12,88),
+  L('Daniel S. Torres',5,'Life insurance','Life and critical illness cover in Davao',1100,'Davao City','Plain-language comparison of term, whole life and CI riders. Visayan, Tagalog or English.',26,40),
+  L('Hazel V. Garcia',8,'Investments','Peso and dollar savings goals for OFWs',2000,'Iloilo City','Set up automatic monthly investing from abroad, with a plan for when you come home.',60,57)],
+ seekersList:[
+  {name:'Joanna R.',city:'Quezon City',wants:['Retirement','Health / HMO'],note:'Office worker, 38. No retirement savings outside SSS yet.'},
+  {name:'Mark L.',city:'Pasig',wants:['Life insurance'],note:'New dad, wants term life before the baby turns one.'},
+  {name:'Bea S.',city:'Makati',wants:['Investments'],note:'Freelance designer, wants to start investing ₱5,000 a month.'},
+  {name:'Carlo D.',city:'Manila',wants:['Debt & budgeting'],note:'Two credit cards to pay down; wants a plan before anything else.'},
+  {name:'Rina T.',city:'Taguig',wants:['Education plan','VUL'],note:'Has a VUL from 2019 and is unsure whether to keep it.'},
+  {name:'Jessa M.',city:'Cebu City',wants:['Health / HMO'],note:'Parents in their 60s need health cover.'},
+  {name:'Kim A.',city:'Quezon City',wants:['Life insurance','Education plan'],note:'Single parent of two. Wants life cover and to start saving for school.'},
+  {name:'Noel V.',city:'Mandaluyong',wants:['Retirement'],note:'Government employee, 52. Wants to know if GSIS alone is enough to retire on.'},
+  {name:'Aira S.',city:'Taguig',wants:['Investments','VUL'],note:'A friend offered her a VUL. Wants a second opinion before signing.'},
+  {name:'Lito B.',city:'Manila',wants:['Health / HMO'],note:'Tricycle operator with no HMO. Wants affordable health cover for the family.'}],
+ seeds:[
+  {p:'Marissa D. Villanueva',s:'Joanna R.',kind:'inquiry',about:'Retirement plan review for employees 35 to 50',status:'open',msgs:[['s',"Hi, is the first consultation really free? I'm 38 and only have SSS so far."],['p','Yes, free and no obligation. I can do Saturday morning on Google Meet. I sent a proposed time below.']],appt:{by:'p',in:'sat',hour:10,mode:'Google Meet',status:'proposed'}},
+  {p:'Grace T. Lim',s:'Joanna R.',kind:'inquiry',about:'Starting out with UITFs and mutual funds',status:'open',msgs:[['s','Hi Grace, can you walk me through opening a UITF?'],['p',"Of course. Let's do a short Google Meet call."],['p','Great talking today, Joanna. I sent the checklist we went through.']],past:[{in:-8,hour:20,mode:'Google Meet',outcome:'met',att:'both'}],sat:'yes'},
+  {p:'Marissa D. Villanueva',s:'Carlo D.',kind:'outreach',about:'Debt & budgeting',status:'open',msgs:[['p','Hi Carlo, I saw you want a plan for your credit cards first. Happy to help, no products involved.'],['s','Thanks, that would help a lot.'],['s','Thanks for last week. Can we do a follow-up to check my progress?']],past:[{in:-6,hour:19,mode:'Google Meet',outcome:'met',att:'both'}],appt:{by:'s',in:4,hour:19,mode:'Google Meet',status:'confirmed'}},
+  {p:'Paolo R. Mendoza',s:'Joanna R.',kind:'outreach',about:'Health / HMO',status:'pending',msgs:[['p','Hi Joanna! You mentioned health cover. I help employees and freelancers compare HMO plans. Want a one-page comparison? No pressure.']]},
+  {p:'Marissa D. Villanueva',s:'Rina T.',kind:'inquiry',about:'Education fund for kids starting school before 2032',status:'open',msgs:[['s',"Hi, I have a VUL from 2019 and want an education plan for my daughter. Can you look at both?"],['p','Yes, bring the VUL contract. How about 6 PM at a café in BGC?'],['s','Perfect, see you there.']],appt:{by:'p',in:-1,hour:18,mode:'In person',where:'Café in BGC',status:'confirmed',due:true}}]},
+dental:{name:'Dentists',provider:'Dentist',providers:'Dentists',seeker:'Patient',seekers:'Patients',cred:'PRC license verified',unit:'',from:'from ',
+ cats:['Cleaning','Braces','Fillings','Extraction','Whitening','Dentures'],
+ listings:[
+  L('Dr. Andrea L. Santos',11,'Braces','Braces consultation with panoramic X-ray',1500,'Quezon City','Consultation, X-ray and a written treatment plan with the monthly adjustment cost.',6,180),
+  L('Dr. Miguel F. Reyes',7,'Cleaning','Cleaning and check-up, Saturdays open',800,'Makati','Oral prophylaxis plus a full check-up. HMO cards accepted.',14,95),
+  L('Dr. Joy C. Dizon',18,'Dentures','Dentures fitting for seniors',6000,'Pasig','Partial and full dentures. Senior citizen discount applies.',40,61),
+  L('Dr. Ben T. Uy',9,'Whitening','In-clinic whitening, one session',9000,'Cebu City','About an hour in the chair with a take-home touch-up kit.',22,44)],
+ seekersList:[{name:'Patrick N.',city:'Quezon City',wants:['Braces'],note:'Adult braces, wants to compare payment plans.'},{name:'Ella G.',city:'Manila',wants:['Cleaning'],note:'Has not had a cleaning in two years.'},{name:'Tess V.',city:'Pasig',wants:['Dentures'],note:'Asking for her father, 72.'}],
+ seeds:[{p:'Dr. Andrea L. Santos',s:'Patrick N.',kind:'inquiry',about:'Braces consultation with panoramic X-ray',status:'open',msgs:[['s','Do you accept HMO for the consultation?'],['p','Yes, for most HMO cards. Bring your card and a valid ID.']]}]},
+home:{name:'Home repairs',provider:'Pro',providers:'Pros',seeker:'Homeowner',seekers:'Homeowners',cred:'TESDA certificate checked',unit:'',from:'',
+ cats:['Aircon cleaning','Plumbing','Electrical','Carpentry','Painting'],
+ listings:[
+  L('Rodel M. Bautista',8,'Aircon cleaning','Split-type and window aircon cleaning',700,'Quezon City','General cleaning, freon check and drainage. Same-week schedule.',3,130,'/unit'),
+  L('Jomar S. Pineda',12,'Plumbing','Leaks, clogs and faucet replacement',500,'Manila','Call-out fee covers the inspection; parts quoted before work starts.',9,77,' call-out'),
+  L('Elmer D. Navarro',10,'Electrical','Outlet, breaker and lighting work',600,'Pasig','Licensed electrician. Photos of the problem get you a faster quote.',30,52,' call-out'),
+  L('Nonoy R. Lopez',15,'Painting','Interior repainting for condos',120,'Taguig','Includes masking and cleanup. Paint brand of your choice.',50,39,'/sq m')],
+ seekersList:[{name:'Lorna P.',city:'Quezon City',wants:['Aircon cleaning'],note:'Three split-type units, before summer.'},{name:'Gab F.',city:'Mandaluyong',wants:['Plumbing'],note:'Kitchen sink leaking under the cabinet.'},{name:'Nica H.',city:'Makati',wants:['Electrical'],note:'Breaker trips when the oven is on.'}],
+ seeds:[{p:'Rodel M. Bautista',s:'Lorna P.',kind:'inquiry',about:'Split-type and window aircon cleaning',status:'open',msgs:[['s','Are you free on Saturday for three units?'],['p','Yes, 9 AM works. Around 3 hours for three units.']]}]},
+kasambahay:{name:'Kasambahay',provider:'Kasambahay',providers:'Kasambahay',seeker:'Household',seekers:'Households',cred:'NBI clearance checked',unit:'/mo',from:'',
+ cats:['Stay-in','Stay-out','Yaya','Cook','Elderly care'],
+ listings:[
+  L('Merlie A. Cruz',10,'Stay-in','All-around stay-in helper',9000,'Quezon City','Cleaning, laundry and cooking for a family of up to five. With references from two past employers.',4,160),
+  L('Lani P. Dela Rosa',6,'Yaya','Yaya for toddlers',10000,'Pasig','Experience with two children under three. First aid trained.',18,98),
+  L('Dolores T. Santos',14,'Elderly care','Caregiver for seniors',12000,'Makati','Medication schedules, mobility help and meal prep for seniors.',36,73),
+  L('Analyn G. Reyes',5,'Cook','Stay-out cook, weekdays',8500,'Cebu City','Filipino home cooking and meal planning on a budget.',70,31)],
+ seekersList:[{name:'Carmela T.',city:'Quezon City',wants:['Stay-in'],note:'Family of four, needs help from January.'},{name:'Ronnie B.',city:'Pasig',wants:['Yaya'],note:'Twins, 18 months.'},{name:'Sol E.',city:'Makati',wants:['Elderly care'],note:'Mother, 80, lives alone.'}],
+ seeds:[{p:'Merlie A. Cruz',s:'Carmela T.',kind:'inquiry',about:'All-around stay-in helper',status:'open',msgs:[['s','Hi Merlie, are you available from January?'],['p','Yes po, ma’am. I finish with my current employer in December.']]}]}
+};
+
+/* sample history: past conversations between other people, so the analytics have something to show */
+function history(vk){
+  let seed=[...vk].reduce((a,c)=>a*7+c.charCodeAt(0),11)%2147483646+1;
+  const rnd=()=>(seed=seed*16807%2147483647)/2147483647,rows=[];
+  V[vk].listings.forEach(l=>{
+    const n=Math.round(l.views/12)+4;
+    for(let i=0;i<n;i++){
+      const kind=rnd()<.18?'outreach':'inquiry',replied=rnd()<(kind==='outreach'?.55:.86);
+      const replyH=replied?Math.round(rnd()**2.2*48*10)/10+.2:null,proposed=replied&&rnd()<.62,set=proposed&&rnd()<.74;
+      const r=rnd(),outcome=set?(r<.72?'met':r<.82?'noshow':r<.88?'disputed':null):null;
+      const s2=rnd(),sat=outcome==='met'?(s2<.6?'yes':s2<.76?'partly':s2<.82?'no':null):null;
+      rows.push({p:l.by,title:kind==='inquiry'?l.title:'',city:l.city,cat:l.cat,kind,replied,replyH,proposed,set,outcome,sat,resched:rnd()<.1?1:0,auto:outcome==='met'&&rnd()<.58,live:false});
+    }
+  });
+  return rows;
+}
+
+const S={calMonth:new Date(NOW.getFullYear(),NOW.getMonth(),1),vk:'finance',lay:'list',ccat:'',crad:25,cready:'',csort:'match',role:'seeker',city:'Quezon City',radius:25,cat:'',q:'',sort:'near',savedOnly:false,optIn:true,open:null,modal:null,amodal:null,data:{},flash:''};
+let tick=100;
+const mkAppt=(a,t)=>{if(!a)return null;const at=dayAt(a.in,a.hour);return {by:a.by,at,dur:60,mode:a.mode,where:a.where||'',status:a.status,due:!!a.due,ans:{s:null,p:null},att:null,meet:a.status==='confirmed'&&a.mode==='Google Meet'?meetCode(t.p+t.s+a.in):null}};
+const mkPast=(x,t)=>({at:dayAt(x.in,x.hour),dur:60,mode:x.mode,where:x.where||'',outcome:x.outcome,att:x.att||null,meet:x.mode==='Google Meet'?meetCode(t.s+t.p+x.in):null});
+const mkThread=t=>{const past=(t.past||[]).map(x=>mkPast(x,t)),met=past.some(x=>x.outcome==='met'),set=!!t.appt&&t.appt.status==='confirmed';
+  return {...t,appt:mkAppt(t.appt,t),past,unlocked:met||set,log:{proposed:!!t.appt||past.length>0,set:met||set,outcome:met?'met':null,sat:t.sat||null,resched:0,followup:!!t.sat,auto:past.some(x=>x.att==='both')}}};
+const D=()=>{if(!S.data[S.vk]){const v=V[S.vk];S.data[S.vk]={listings:v.listings.map((l,i)=>({...l,id:'l'+i})),threads:v.seeds.map((t,i)=>({...mkThread(t),id:'t'+i,ts:i,msgs:t.msgs.map(([f,x])=>({f,t:x}))})),used:3,saved:new Set(),hist:history(S.vk)}}return S.data[S.vk]};
+const v=()=>V[S.vk];
+const meP=()=>v().listings[0].by, meS=()=>v().seekersList[0].name;
+const me=()=>S.role==='seeker'?'s':'p';
+const nm=(t,side)=>side==='s'?t.s:t.p;
+const ini=n=>{const w=n.replace(/^Dr\. /,'').split(' ');return w[0][0]+w[w.length-1][0]};
+const first=n=>n.startsWith('Dr. ')?n.split(' ').slice(0,2).join(' '):n.split(' ')[0];
+const peso=(l)=>l.price===0?'Free':(v().from+'₱'+l.price.toLocaleString('en-PH')+(l.unit||v().unit));
+const ago=h=>h<1?'just now':h<24?h+'h ago':Math.round(h/24)+'d ago';
+const dist=c=>{const k=km(S.city,c);return k<1?'in your city':k<10?k.toFixed(1)+' km':Math.round(k)+' km'};
+const mine=t=>S.role==='seeker'?t.s===meS():t.p===meP();
+const other=t=>S.role==='seeker'?t.p:t.s;
+const myThreads=()=>D().threads.filter(t=>mine(t)&&!(S.role==='seeker'&&t.kind==='outreach'&&!S.optIn&&t.status==='pending')).sort((a,b)=>b.ts-a.ts);
+const needsMe=t=>{
+  const m=me(),a=t.appt;
+  if(t.status==='declined'||t.status==='reported')return false;
+  if(t.kind==='outreach'&&t.status==='pending')return m==='s';
+  if(a&&a.status==='proposed'&&a.by!==m)return true;
+  if(a&&a.status==='confirmed'&&a.due&&!a.ans[m])return true;
+  if(m==='s'&&t.log.outcome==='met'&&t.log.followup&&!t.log.sat)return true;
+  const last=t.msgs.filter(x=>x.f!=='x').pop();return !!last&&last.f!==m&&!a&&!t.log.outcome;
+};
+const waiting=()=>myThreads().filter(needsMe).length;
+const TABS={seeker:[['browse','Browse'],['inbox','Messages'],['cal','My calendar'],['plan','Plan']],provider:[['clients','Client feed'],['post','My listings'],['inbox','Messages'],['cal','My calendar'],['stats','Analytics'],['plan','Plan']],admin:[['stats','Marketplace health'],['plan','Plan']]};
+const route=()=>{const h=location.hash.slice(1),ok=TABS[S.role].map(t=>t[0]);if(ok.includes(h))return h;if(['post','clients'].includes(h)){S.role='provider';return h}if(h==='browse'){S.role='seeker';return h}return ok[0]};
+
+function header(){
+  const cur=route(),w=S.role==='admin'?0:waiting();
+  $('#sbar').hidden=cur!=='browse';
+  $('#city').innerHTML=Object.keys(CITIES).map(c=>`<option${c===S.city?' selected':''}>${c}</option>`).join('');
+  $('#q').placeholder=`What do you need? e.g. ${v().cats[0].toLowerCase()}`;
+  if(document.activeElement!==$('#q'))$('#q').value=S.q;
+  $('#lay').hidden=!['browse','clients'].includes(cur);
+  document.querySelector('[data-act=prem]').setAttribute('aria-pressed',String(!!S.premium));
+  document.querySelectorAll('[data-act=lay]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.lay)));
+  $('#roles').innerHTML=['seeker','provider','admin'].map(r=>`<button data-act="role" data-r="${r}" aria-pressed="${S.role===r}">${esc(v()[r]||'Admin')} view</button>`).join('');
+  $('#tabs').innerHTML=TABS[S.role].map(([k,l])=>`<a href="#${k}"${k===cur?' aria-current="page"':''}>${esc(l||v().seekers+' open to contact')}${k==='inbox'&&w?`<span class="n">${w}</span>`:''}</a>`).join('');
+}
+function render(){
+  header();const r=route();
+  $('#plan').hidden=r!=='plan';$('#view').hidden=r==='plan';$('#tip').hidden=true;
+  if(r==='plan'){$('#view').innerHTML='';return}
+  $('#view').innerHTML=({browse,inbox,post,clients,cal:calendar,stats:()=>S.role==='admin'?adminStats():advStats()})[r]();
+  if(r==='browse'&&S.prof){$('#view').innerHTML=profile();return}
+  if(r==='browse')feed();
+  if(r==='clients')cfeed();
+}
+/* sample reviews: one per provider, only from meetings both sides confirmed */
+const REV={
+ 'Marissa D. Villanueva':[4.9,'Ana P.','She laid out my SSS and Pag-IBIG benefits on one page and showed me exactly how big the gap was. No hard sell, just a clear plan I could follow.'],
+ 'Paolo R. Mendoza':[4.7,'Kevin T.','Compared three HMO cards side by side and explained the waiting periods before I signed anything. Very patient with a freelancer who knew nothing.'],
+ 'Grace T. Lim':[5.0,'Mica R.','Walked me through opening my first UITF during the call. I finally understand what risk level I picked and why it fits my goal.'],
+ 'Ramon C. Aquino':[4.6,'Jun S.','Helped us work out how much cover we actually need for the kids. The quotes came the next day, all term life like we asked.'],
+ 'Liza M. Fernandez':[4.9,'Cherry L.','Read my VUL contract with me line by line, charges and all. She did not try to sell me anything new.'],
+ 'Arnel P. Castro':[4.8,'Weng D.','My husband works in Riyadh. Arnel set up a remittance budget we both follow, and we already paid off one card.'],
+ 'Kristine B. Ong':[4.8,'Rod M.','Separated my store money from my personal money first. Now I put something aside for retirement every month, even in slow months.'],
+ 'Daniel S. Torres':[4.5,'Lyn A.','Explained term versus whole life in Bisaya so my parents could follow along too.'],
+ 'Hazel V. Garcia':[4.7,'Jay B.','Set up automatic monthly investing while I am still in Dubai, with a plan for when I come home.'],
+ 'Dr. Andrea L. Santos':[4.9,'Ivy C.','Got a written plan with the monthly adjustment cost before deciding. No surprises after that.'],
+ 'Dr. Miguel F. Reyes':[4.7,'Leo F.','The Saturday slot saved me a leave day. Gentle cleaning, and they accepted my HMO card.'],
+ 'Dr. Joy C. Dizon':[5.0,'Nora G.','My lola’s dentures fit well after two adjustments, and they applied the senior discount without us asking.'],
+ 'Dr. Ben T. Uy':[4.6,'Kat M.','One session with a noticeable result, and clear instructions for the take-home kit.'],
+ 'Rodel M. Bautista':[4.9,'Bong E.','Cleaned three split-type units in under three hours and left the floor spotless.'],
+ 'Jomar S. Pineda':[4.7,'Mae Y.','Quoted the parts before starting. The leak under the sink is fixed for good.'],
+ 'Elmer D. Navarro':[4.8,'Dennis O.','Found the faulty breaker fast and explained what not to run at the same time.'],
+ 'Nonoy R. Lopez':[4.6,'Abby K.','Neat work. He masked everything and cleaned up after, and our condo looks new.'],
+ 'Merlie A. Cruz':[4.9,'Ellen T.','Reliable and organized. The house runs smoothly and the kids love her cooking.'],
+ 'Lani P. Dela Rosa':[4.8,'Joy R.','Calm and patient with our two toddlers. Her first-aid training gives us peace of mind.'],
+ 'Dolores T. Santos':[5.0,'Ben A.','Kept my father’s medicines on schedule and treated him with real respect.'],
+ 'Analyn G. Reyes':[4.7,'Grace W.','Good home cooking on a set budget. She plans the week’s menu every Sunday.']};
+const IC={trophy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></svg>',pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>'};
+const hue=s=>[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%3;
+const rl=r=>r>=4.95?'Exceptional':r>=4.8?'Excellent':r>=4.6?'Great':r>=4.3?'Very good':'Good';
+const respTxt=h=>h<1?`in about ${Math.max(5,Math.round(h*12)*5)} min`:h<24?`in about ${Math.round(h)} ${Math.round(h)===1?'hour':'hours'}`:'in a day or two';
+const pstats=()=>{const d=D();if(d.ps)return d.ps;const g={};d.hist.forEach(r=>{const s=(g[r.p]??={met:0,hs:[]});if(r.outcome==='met')s.met++;if(r.replyH!=null)s.hs.push(r.replyH)});Object.values(g).forEach(s=>{s.hs.sort((a,b)=>a-b);s.med=s.hs.length?s.hs[Math.floor(s.hs.length/2)]:null});return d.ps=g};
+function browse(){
+  const x=v(),P=x.providers.toLowerCase();
+  const radio=(name,val,cur,label)=>`<label><input type="radio" name="${name}" value="${esc(val)}"${String(cur)===String(val)?' checked':''}> ${esc(label)}</label>`;
+  return `<div class="tt"><button class="ghost fbtn" data-act="filters" aria-expanded="${!!S.showF}" aria-controls="side">Filters</button>
+  <aside class="side${S.showF?' open':''}" id="side" aria-label="Filters"><h2>${esc(x.name)}</h2>
+   <fieldset><legend>What do you need help with?</legend>${['',...x.cats].map(c=>radio('fcat',c,S.cat,c||'All categories')).join('')}</fieldset>
+   <fieldset><legend>How far from ${esc(S.city)}?</legend>${[[5,'Within 5 km'],[10,'Within 10 km'],[25,'Within 25 km'],[0,'Anywhere in PH']].map(([k,l])=>radio('frad',k,S.radius,l)).join('')}</fieldset>
+   <fieldset><legend>Sort by</legend>${radio('fsort','near',S.sort,'Nearest first')}${radio('fsort','new',S.sort,'Newest first')}</fieldset>
+   <fieldset><legend>Saved</legend><label><input type="checkbox" id="saved"${S.savedOnly?' checked':''}> Show saved only</label></fieldset>
+   <div class="optbox"><label><input type="checkbox" id="optin"${S.optIn?' checked':''}> Let ${esc(P)} reach out to me</label><span class="muted">They see your first name, city and interests (${esc(x.seekersList[0].wants.join(', '))}). Your number is only shared once you both agree on a meeting.</span></div>
+  </aside><section class="feedcol${S.lay==='grid'?' wide':''}"><div class="res-head"><h1>Matching ${esc(P)}</h1><div class="crit-row"><button class="crit" type="button" data-tip="Ranked only by distance and how recently the listing was posted. Paid plans and analytics never change the order.">Our criteria <i aria-hidden="true">i</i></button><span class="muted" id="fh"></span></div></div><div id="feed"></div>
+  <p class="sample">Sample people, listings and reviews. Signed in as ${esc(meS())}, screened ${esc(x.seeker.toLowerCase())}.</p></section></div>`;
+}
+function feed(){
+  const x=v(),d=D(),q=S.q.trim().toLowerCase(),ps=pstats(),live=liveRows(),P=x.providers.toLowerCase();
+  let ls=d.listings.filter(l=>!l.paused).map(l=>({...l,k:km(S.city,l.city)}))
+   .filter(l=>(!S.radius||l.k<=S.radius)&&(!S.cat||l.cat===S.cat)&&(!S.savedOnly||d.saved.has(l.id))&&(!q||[l.title,l.desc,l.by,l.cat].join(' ').toLowerCase().includes(q)));
+  ls.sort(S.sort==='near'?(a,b)=>a.k-b.k||a.h-b.h:(a,b)=>a.h-b.h);
+  $('#fh').textContent=`${ls.length} ${S.radius?'near '+S.city:'across the Philippines'}`;
+  const top=ls.slice(0,4);S.top=top;
+  const banner=top.length>1?`<div class="top4"><div class="avs" aria-hidden="true">${top.map(l=>`<span class="av c${hue(l.by)}">${esc(ini(l.by))}</span>`).join('')}</div><div class="t"><b>Message your top ${top.length} matches</b><span>The first ${top.length} ${esc(P)} for your filters. Each gets their own conversation, and your number stays hidden until you agree on a meeting.</span></div><button class="btn" data-act="top4">Message ${top.length} ${esc(P)}</button></div>`:'';
+  $('#feed').innerHTML=ls.length?banner+`<div class="pros${S.lay==='grid'?' g':''}">${ls.map(l=>{
+   const s=ps[l.by]||{met:0,med:null},met=s.met+live.filter(r=>r.p===l.by&&r.outcome==='met').length,rv=REV[l.by],r=rv?rv[0]:0,n=Math.max(1,Math.round(met*.6)),isTop=r>=4.8&&met>=10,med=s.med,on=med!=null&&med<2;
+   return `<article class="pro"><button class="big c${hue(l.by)}" data-act="prof" data-n="${esc(l.by)}" tabindex="-1" aria-hidden="true">${esc(ini(l.by))}</button><div>
+   <h3><button class="plink" data-act="prof" data-n="${esc(l.by)}">${esc(l.by)}</button></h3>
+   <div class="rate">${isTop?`<span class="topb"><i aria-hidden="true">★</i>Top ${esc(x.provider.toLowerCase())}</span>`:''}${rv?`<b>${rl(r)} ${r.toFixed(1)}</b><span class="stars" style="--p:${r/5*100}%" aria-hidden="true">★★★★★</span><span class="muted" tabindex="0" data-tip="Reviews only come from meetings both sides confirmed">(${n})</span>`:'<span class="muted">New on Tulay, no reviews yet</span>'}</div>
+   <p class="lt">${esc(l.title)}</p><p class="ld">${esc(l.desc)}</p>
+   <div class="pills"><span class="pill">${esc(peso(l))}</span><span class="pill c">${esc(l.cat)}</span></div>
+   <ul class="facts"><li><span class="dot${on?'':' off'}" aria-hidden="true"></span>${med==null?'<b>New on Tulay</b>':on?`<span>Online now · <b>responds ${respTxt(med)}</b></span>`:`<b>Usually responds ${respTxt(med)}</b>`}</li>
+   <li>${IC.trophy}<span>${met} successful ${met===1?'meeting':'meetings'} on Tulay</span></li>
+   <li>${IC.pin}<span>${esc(l.city)} · ${dist(l.city)}</span></li>
+   <li>${IC.check}<span>${esc(x.cred)} · ${l.yrs} yrs</span></li></ul></div>
+   <div class="pro-foot"><p class="quote"><span class="q">${rv?`${esc(rv[1])} says, “${esc(rv[2])}”`:esc(l.desc)}</span> <button data-act="more" aria-expanded="false">See more</button></p>
+   <div class="acts"><button class="ghost" data-act="save" data-id="${l.id}" aria-pressed="${d.saved.has(l.id)}">${d.saved.has(l.id)?'Saved':'Save'}</button><button class="ghost" data-act="prof" data-n="${esc(l.by)}">View profile</button><button class="btn" data-act="msg" data-id="${l.id}">Message</button></div></div></article>`}).join('')}</div>`:`<div class="empty">No ${esc(P)} match these filters${S.radius?` within ${S.radius} km`:''}. Try a wider radius or another category.</div>`;
+}
+
+/* ---------- advisor profile ---------- */
+const ABOUT={
+ 'Marissa D. Villanueva':{bio:'I have helped employees in Quezon City plan for retirement for 9 years. Most people come to me with only SSS and Pag-IBIG, so we start there: what you will actually receive, what is missing, and realistic ways to close the gap. The first consultation is free, and I never push a product in it.',langs:'Filipino, English',modes:'Google Meet, or in person in QC'},
+ 'Paolo R. Mendoza':{bio:'I work mostly with freelancers and small-team employees who have no company HMO. I compare plans side by side and explain waiting periods, exclusions and riders before you decide anything.',langs:'English, Filipino',modes:'Google Meet, or in person in Makati'},
+ 'Grace T. Lim':{bio:'Twelve years helping first-time investors start with UITFs and mutual funds. We set a clear goal, pick a risk level you are comfortable with, and I walk you through opening the account step by step.',langs:'English, Filipino',modes:'Google Meet'},
+ 'Ramon C. Aquino':{bio:'I focus on term life for young families: pure protection, with no investment part. Together we work out how much cover your family really needs, then compare a few quotes.',langs:'Filipino, English',modes:'Google Meet, or in person in Pasig'},
+ 'Liza M. Fernandez':{bio:'Many people bought a VUL years ago and are no longer sure it fits. I read the contract with you, explain the charges and fund performance, and help you decide whether to keep, reduce or surrender it. I do not sell in these sessions.',langs:'English, Filipino',modes:'Google Meet, or in person in Mandaluyong'},
+ 'Arnel P. Castro':{bio:'I help OFW families build a budget around remittances, pay down cards and loans, and set up an emergency fund before thinking about insurance or investments.',langs:'Filipino, English, Ilocano',modes:'Google Meet, any time zone'},
+ 'Kristine B. Ong':{bio:'I work with small business owners who want to separate business and personal money and build a retirement fund that survives a slow sales year.',langs:'Cebuano, English, Filipino',modes:'Google Meet, or in person in Cebu City'},
+ 'Daniel S. Torres':{bio:'Plain-language comparisons of term, whole life and critical illness cover for families in Davao. Parents and grandparents are welcome to join the call.',langs:'Bisaya, Filipino, English',modes:'Google Meet, or in person in Davao City'},
+ 'Hazel V. Garcia':{bio:'I help OFWs set up automatic monthly investing from abroad, with a clear plan for the day they come home for good.',langs:'Hiligaynon, Filipino, English',modes:'Google Meet, any time zone'}};
+const RPOOL=[['Rhea M.','Explained everything in plain Filipino. No pressure to buy anything on the first call.'],['Jomar T.','Came prepared, with questions based on what I wrote in my request. The hour went by fast.'],['Carla V.','Answered my messages the same day, even on a weekend.'],['Ian P.','Gave me two options and was honest about which one did not fit my situation.'],['Pia L.','Started on time, finished on time, and sent clear next steps afterward.'],['Ruel D.','Helped my wife and me agree on a monthly budget before we talked about any product.'],['Tin S.','I came in confused about my company benefits and left with a one-page summary.'],['Ely G.','Patient with all my questions, and followed up a week later without being pushy.']];
+function adv(name){const s=pstats()[name]||{met:0,med:null},met=s.met+liveRows().filter(r=>r.p===name&&r.outcome==='met').length,rv=REV[name],r=rv?rv[0]:0;return {met,med:s.med,rv,r,n:rv?Math.max(1,Math.round(met*.6)):0,isTop:r>=4.8&&met>=10,on:s.med!=null&&s.med<2}}
+const respLine=a=>a.med==null?'<b>New on Tulay</b>':a.on?`<span>Online now · <b>responds ${respTxt(a.med)}</b></span>`:`<b>Usually responds ${respTxt(a.med)}</b>`;
+const starRow=r=>`<span class="stars" style="--p:${r/5*100}%" aria-hidden="true">★★★★★</span>`;
+function profile(){
+  const x=v(),d=D(),name=S.prof,a=adv(name),all=d.listings.filter(l=>l.by===name),ls=all.filter(l=>!l.paused),ab=ABOUT[name]||{bio:'',langs:'',modes:''},any=all[0]||{yrs:0,city:''};
+  const cats=[...new Set(ls.map(l=>l.cat))],min=ls.length?Math.min(...ls.map(l=>l.price)):null,price=min===null?'':min===0?'Free':'₱'+min.toLocaleString('en-PH')+x.unit,fl=ls[0];
+  const seed=[...name].reduce((s,c)=>s+c.charCodeAt(0),0),when=['1 week ago','3 weeks ago','1 month ago','2 months ago'];
+  const rvs=a.rv?[[a.rv[1],a.rv[2],5],...[0,1,2].map(j=>{const p=RPOOL[(seed+j)%RPOOL.length];return [p[0],p[1],a.r<4.8&&j===1?4:5]})].slice(0,Math.min(4,a.n)):[];
+  const five=Math.round(a.n*Math.min(1,Math.max(0,a.r-4))),dist5={5:five,4:a.n-five,3:0,2:0,1:0};
+  const msgBtn=fl?`<button class="btn" data-act="msg" data-id="${fl.id}">Message ${esc(first(name))}</button>`:'';
+  return `<button class="ghost sm back" data-act="unprof">← Back to results</button>
+  <div class="pf"><div>
+   <section class="pf-top"><div class="big c${hue(name)}" aria-hidden="true">${esc(ini(name))}</div><div>
+    <h1>${esc(name)}</h1>
+    <div class="rate">${a.isTop?`<span class="topb"><i aria-hidden="true">★</i>Top ${esc(x.provider.toLowerCase())}</span>`:''}${a.rv?`<b>${rl(a.r)} ${a.r.toFixed(1)}</b>${starRow(a.r)}<span class="muted">(${a.n} reviews)</span>`:'<span class="muted">New on Tulay, no reviews yet</span>'}</div>
+    <ul class="facts"><li><span class="dot${a.on?'':' off'}" aria-hidden="true"></span>${respLine(a)}</li><li>${IC.trophy}<span>${a.met} successful ${a.met===1?'meeting':'meetings'} on Tulay</span></li><li>${IC.pin}<span>${esc(any.city)} · ${dist(any.city)}</span></li><li>${IC.check}<span>${esc(x.cred)} · ${any.yrs} yrs in practice</span></li></ul>
+    <div class="pf-mob">${msgBtn}</div></div></section>
+   <section class="pf-sec"><h2>About</h2>${ab.bio?`<p>${esc(ab.bio)}</p>`:''}
+    <dl class="pf-dl"><div><dt>Specialties</dt><dd>${esc(cats.join(', ')||'None listed')}</dd></div>${ab.langs?`<div><dt>Languages</dt><dd>${esc(ab.langs)}</dd></div>`:''}${ab.modes?`<div><dt>Meets by</dt><dd>${esc(ab.modes)}</dd></div>`:''}<div><dt>License</dt><dd>Insurance Commission license checked by Tulay</dd></div></dl></section>
+   <section class="pf-sec"><h2>Active listings <span class="muted">(${ls.length})</span></h2>${ls.length?`<div class="pf-ls">${ls.map(l=>`<article class="pl"><div><span class="pill c">${esc(l.cat)}</span><h3>${esc(l.title)}</h3><p class="muted">${esc(l.desc)}</p><span class="pl-m"><b>${esc(peso(l))}</b> · ${esc(l.city)} · posted ${ago(l.h)}</span></div><div class="pl-a"><button class="ghost" data-act="save" data-id="${l.id}" aria-pressed="${d.saved.has(l.id)}">${d.saved.has(l.id)?'Saved':'Save'}</button><button class="btn" data-act="msg" data-id="${l.id}">Message</button></div></article>`).join('')}</div>`:'<p class="muted">No active listings right now.</p>'}</section>
+   <section class="pf-sec"><h2>Reviews</h2>${a.rv?`<div class="rv-sum"><div class="rv-big"><b>${a.r.toFixed(1)}</b>${starRow(a.r)}<span class="muted">${a.n} reviews</span></div><div class="rv-bars">${[5,4,3,2,1].map(k=>`<div><span>${k} ★</span><span class="db"><i style="width:${a.n?dist5[k]/a.n*100:0}%"></i></span><span class="dv">${dist5[k]}</span></div>`).join('')}</div></div>
+    <p class="muted" style="margin:0">Only clients who both confirmed a meeting with ${esc(first(name))} can leave a review.</p>
+    <ul class="rv-l">${rvs.map(([who,txt,st],j)=>`<li><div class="rv-h"><b>${esc(who)}</b>${starRow(st)}<span class="vtag">✓ Confirmed meeting</span><span class="muted">${when[j]}${cats.length?' · '+esc(cats[j%cats.length]):''}</span></div><p>${esc(txt)}</p></li>`).join('')}</ul>`:'<p class="muted">No reviews yet. Reviews appear after a meeting both sides confirmed.</p>'}</section>
+  </div>
+  <aside class="pf-side"><div class="pf-card">${price?`<span class="muted">Starting at</span><b class="pf-price">${esc(price)}</b>`:''}<span>${respLine(a)}</span>${msgBtn}<p class="muted" style="margin:0;font-size:14px">Your number stays hidden until you both agree on a meeting time.</p></div></aside></div>
+  <p class="sample">Sample advisor, listings and reviews.</p>`;
+}
+
+/* ---------- appointments ---------- */
+const ANS={met:'Yes, we met',noshow:"They didn't show",resched:'We rescheduled'};
+const SAT={yes:'Yes',partly:'Partly',no:'No'};
+const whenTxt=a=>`${fmtWhen(a.at)} · ${a.dur} min · ${a.mode}${a.where?' · '+a.where:''}`;
+const gcal=(t,a)=>{const end=new Date(a.at.getTime()+a.dur*60000);return 'https://calendar.google.com/calendar/render?dates='+gdt(a.at)+'/'+gdt(end)+'&'+new URLSearchParams({action:'TEMPLATE',text:'Tulay: '+t.about,details:`Meeting between ${t.s} and ${t.p}, booked through Tulay.`+(a.meet?`\nJoin with Google Meet: ${meetUrl(a)}`:''),location:a.meet?meetUrl(a):a.where||''}).toString()};
+const attTxt=(t,v)=>v==='none'?'nobody joined':`only ${nm(t,v)} joined`;
+const finish=(t,oc)=>{const a=t.appt;t.past.push({at:a.at,dur:a.dur,mode:a.mode,where:a.where,meet:a.meet,att:a.att||null,outcome:oc});t.appt=null};
+const proto=(t,side,btns)=>`<div class="proto"><span>Prototype, act as ${esc(nm(t,side))}:</span>${btns.map(([act,label,val])=>`<button class="ghost sm" data-act="${act}" data-as="${side}"${val?` data-v="${val}"`:''}>${esc(label)}</button>`).join('')}</div>`;
+const tagOf=t=>{const a=t.appt;if(t.status==='declined')return ' · declined';if(t.status==='reported')return ' · reported';if(t.status==='pending')return ' · pending';if(a&&a.status==='proposed')return ' · meeting proposed';if(a&&a.status==='confirmed')return a.due?' · check-in':' · meeting set';if(t.log.outcome==='met')return ' · met';if(t.log.outcome==='disputed')return ' · under review';if(t.log.outcome)return ' · missed';return ''};
+function apptBlock(t){
+  const m=me(),o=m==='s'?'p':'s',on=nm(t,o),a=t.appt;let h='';
+  if(a&&a.status==='proposed'){
+    if(a.by===m)h+=`<div class="appt"><span class="tag">You proposed a meeting</span><b>${esc(whenTxt(a))}</b><span class="muted">Waiting for ${esc(on)} to accept.</span><div class="row"><button class="ghost" data-act="acancel">Withdraw</button></div></div>`+proto(t,o,[['aaccept','Accept'],['acounter','Suggest another time'],['adecline','Decline']]);
+    else h+=`<div class="appt"><span class="tag">${esc(on)} proposed a meeting</span><b>${esc(whenTxt(a))}</b><span class="muted">${a.mode==='Google Meet'?'Accepting creates the Google Meet link and adds it to both your Google Calendars. ':'Accepting adds it to both your Google Calendars. '}${t.unlocked?'':'It also shares your numbers with each other.'}</span><div class="row"><button class="btn" data-act="aaccept">Accept</button><button class="ghost" data-act="acounter">Suggest another time</button><button class="ghost" data-act="adecline">Decline</button></div></div>`;
+  }else if(a&&a.status==='confirmed'&&!a.due){
+    h+=`<div class="appt set"><span class="tag">Meeting set</span><b>${esc(whenTxt(a))}</b>${a.meet?`<span class="meetl">Google Meet: <a href="${meetUrl(a)}" target="_blank" rel="noopener">${meetUrl(a).replace('https://','')}</a> <span class="muted">(sample link)</span></span>`:''}<span class="muted">In both your Google Calendars${a.meet?' with the Meet link':''}.</span><div class="row">${a.meet?`<a class="btn lnk" href="${meetUrl(a)}" target="_blank" rel="noopener">Join Google Meet</a>`:''}<a class="ghost lnk" href="${esc(gcal(t,a))}" target="_blank" rel="noopener">Open in Google Calendar</a><button class="ghost" data-act="acounter">Reschedule</button><button class="ghost" data-act="acancel">Cancel meeting</button></div></div>`+(a.meet?`<div class="proto"><span>Prototype, after the meeting Google Meet shows:</span><button class="ghost sm" data-act="askip" data-v="both">Both joined</button><button class="ghost sm" data-act="askip" data-v="s">Only ${esc(first(t.s))} joined</button><button class="ghost sm" data-act="askip" data-v="p">Only ${esc(first(t.p))} joined</button><button class="ghost sm" data-act="askip" data-v="none">Nobody joined</button></div>`:`<div class="proto"><span>Prototype:</span><button class="ghost sm" data-act="askip">Skip to after the meeting</button></div>`);
+  }else if(a&&a.status==='confirmed'){
+    const mineA=a.ans[m],theirs=a.ans[o];
+    h+=`<div class="appt"><span class="tag">Check-in</span><b>Did you meet ${esc(on)}?</b><span class="muted">${esc(whenTxt(a))}</span>${a.att?`<span>Google Meet shows ${esc(attTxt(t,a.att))}, so we're asking you both.</span>`:''}${mineA?`<span>You answered: <b>${esc(ANS[mineA])}</b></span>`:`<div class="row">${Object.entries(ANS).map(([k,l])=>`<button class="${k==='met'?'btn':'ghost'}" data-act="ans" data-v="${k}">${esc(l)}</button>`).join('')}</div>`}<span class="muted">${theirs?`${esc(on)} has answered too.`:`Waiting for ${esc(on)}'s answer. It only counts as met when you both say yes.`}</span></div>`+(theirs?'':proto(t,o,Object.entries(ANS).map(([k,l])=>['ans',l,k])));
+  }else if(!a&&t.log.outcome){
+    const oc=t.log.outcome;
+    const lp=t.past[t.past.length-1];
+    h+=`<div class="res${oc==='met'?' good':''}"><b>${oc==='met'?'✓ Successful appointment':oc==='disputed'?"! Your answers didn't match":'! Missed meeting'}</b><span class="muted">${oc==='met'?(lp&&lp.att==='both'?'Google Meet shows you both joined.':'You both confirmed you met.'):oc==='disputed'?'One of you said you met and the other said no-show. The Tulay team will look into it.':'Neither of you confirmed the meeting.'}</span></div>`;
+    if(oc==='met'){
+      if(!t.log.followup)h+=`<div class="proto"><span>Prototype:</span><button class="ghost sm" data-act="askip2">Skip 2 weeks ahead</button></div>`;
+      else if(!t.log.sat)h+=m==='s'?`<div class="appt"><span class="tag">Follow-up</span><b>Did you get the help you needed from ${esc(first(t.p))}?</b><span class="muted">Only the Tulay team sees your answer. We don't ask whether you bought anything.</span><div class="row">${Object.entries(SAT).map(([k,l])=>`<button class="ghost" data-act="sat" data-v="${k}">${l}</button>`).join('')}</div></div>`:`<p class="note">${esc(t.s)} was asked whether they got the help they needed. Only the Tulay team sees individual answers.</p>`+proto(t,'s',Object.entries(SAT).map(([k,l])=>['sat',l,k]));
+      else h+=m==='s'?`<p class="note">You answered the follow-up: ${esc(SAT[t.log.sat])}. Thank you.</p>`:`<p class="note">${esc(t.s)} answered the follow-up. It counts toward your analytics without showing their answer.</p>`;
+    }
+  }else if(!a&&!t.unlocked){
+    h+=`<p class="note">Numbers stay hidden until you both agree on a meeting time. Propose one when you're ready.</p>`;
+  }
+  if(t.unlocked)h+=`<div class="contact"><span class="tag">Numbers shared</span><span>${esc(on)}: <b>${phone(on)}</b></span><span>You: <b>${phone(nm(t,m))}</b></span></div>`;
+  return h;
+}
+function inbox(){
+  const ts=myThreads(),x=v();
+  if(!ts.length)return `<div class="empty">No messages yet.</div>`;
+  if(!ts.find(t=>t.id===S.open))S.open=ts[0].id;
+  const t=ts.find(t=>t.id===S.open),m=me(),who=other(t);
+  const hidden=S.role==='seeker'&&!S.optIn?`<p class="note" style="margin-bottom:14px">Outreach is off, so new ${esc(x.providers.toLowerCase())} can't start a conversation with you.</p>`:'';
+  let foot='';
+  if(t.status==='declined'||t.status==='reported')foot=`<p class="note">This conversation is closed.</p>`;
+  else if(t.kind==='outreach'&&t.status==='pending')foot=S.role==='seeker'?`<p class="note">${esc(who)} reached out because you're open to contact. Accept to reply; decline and they can't message you again.</p><div class="row"><button class="btn" data-act="accept">Accept</button><button class="ghost" data-act="decline">Decline</button><button class="ghost" data-act="report">Report</button></div>`:`<p class="note">Waiting for ${esc(who)} to accept. You can't send more until they do.</p>`+proto(t,'s',[['accept','Accept'],['decline','Decline']]);
+  else foot=apptBlock(t)+`<label class="lbl" for="reply">Reply<textarea id="reply" placeholder="${t.unlocked?'Write a message':'Write a message. Numbers and emails are hidden until a meeting is set.'}"></textarea></label><div class="row"><button class="btn" data-act="reply">Send</button>${t.appt?'':`<button class="ghost" data-act="propose">${t.log.outcome==='met'?'Book another meeting':'Propose a meeting'}</button>`}<button class="ghost" data-act="report">Report</button></div>`;
+  return `<div class="head"><h1>Messages</h1><span class="muted">Signed in as ${esc(S.role==='seeker'?meS():meP())}</span></div>${hidden}<div class="inbox"><div class="tl">${ts.map(t=>{const msg=t.msgs.filter(x=>x.f!=='x').pop();return `<button class="ti" data-act="open" data-id="${t.id}" aria-current="${t.id===S.open}"><b>${esc(other(t))}</b><span class="tag">${t.kind==='outreach'?'Outreach':'Inquiry'}${tagOf(t)}</span><small>${esc(msg?msg.t:'')}</small></button>`}).join('')}</div>
+  <section class="th"><div><h2 style="font-size:24px">${esc(who)}</h2><span class="muted">${t.kind==='outreach'?'Reached out about':'About'}: ${esc(t.about)}</span></div>
+  <div class="msgs">${t.msgs.map(x=>`<div class="m ${x.f==='x'?'sys':x.f===m?'me':''}">${esc(x.t)}</div>`).join('')}</div>${foot}</section></div>`;
+}
+const ST={proposed:'Proposed, not in your calendar yet',set:'Meeting set',due:'Check-in needed',met:'✓ Met',noshow:'Missed',disputed:'Under review',resched:'Rescheduled',cancelled:'Cancelled'};
+const evCls=s=>s==='proposed'?'tent':s==='set'||s==='due'?'set':s==='met'?'met':'off';
+function myEvents(){const evs=[];myThreads().forEach(t=>{t.past.forEach(x=>evs.push({t,...x,st:x.outcome}));const a=t.appt;if(a)evs.push({t,...a,st:a.status==='proposed'?'proposed':a.due?'due':'set'})});return evs.sort((x,y)=>x.at-y.at)}
+function evCard(e){
+  const t=e.t,end=new Date(e.at.getTime()+e.dur*60000);
+  return `<div class="ev ${evCls(e.st)}"><div class="evd"><b>${e.at.getDate()}</b><span>${e.at.toLocaleDateString('en-US',{month:'short'})}</span></div><div class="evb"><span class="tag">${esc(ST[e.st])}</span><b>${esc(tm(e.at))} to ${esc(tm(end))} · ${esc(other(t))}</b><span class="muted">${esc(t.about)} · ${esc(e.mode)}${e.where?' · '+esc(e.where):''}</span>
+  <div class="row">${e.st==='set'&&e.meet?`<a class="btn sm lnk" href="${meetUrl(e)}" target="_blank" rel="noopener">Join Google Meet</a>`:''}${e.st!=='proposed'?`<a class="ghost sm lnk" href="${esc(gcal(t,e))}" target="_blank" rel="noopener">Open in Google Calendar</a>`:''}<button class="ghost sm" data-act="open" data-id="${t.id}">Conversation</button></div></div></div>`;
+}
+function calendar(){
+  const x=v(),m=me(),name=m==='s'?meS():meP(),evs=myEvents(),mo=S.calMonth,y=mo.getFullYear(),mi=mo.getMonth();
+  const lead=new Date(y,mi,1).getDay(),days=new Date(y,mi+1,0).getDate();
+  let cells='';for(let i=0;i<lead;i++)cells+='<div class="cd pad" aria-hidden="true"></div>';
+  for(let d=1;d<=days;d++){
+    const de=evs.filter(e=>e.at.getFullYear()===y&&e.at.getMonth()===mi&&e.at.getDate()===d),today=y===NOW.getFullYear()&&mi===NOW.getMonth()&&d===NOW.getDate();
+    cells+=`<div class="cd${today?' today':''}"><span class="dn">${d}</span>${de.map(e=>`<button class="ce ${evCls(e.st)}" data-act="open" data-id="${e.t.id}" title="${esc(ST[e.st]+': '+fmtWhen(e.at)+' with '+other(e.t))}" aria-label="${esc(ST[e.st]+', '+fmtWhen(e.at)+' with '+other(e.t))}"><span>${esc(tm(e.at))} ${esc(first(other(e.t)))}</span></button>`).join('')}</div>`;
+  }
+  const open=['proposed','set','due'],up=evs.filter(e=>open.includes(e.st)),past=evs.filter(e=>!open.includes(e.st)).reverse();
+  return `<div class="prof"><div class="av big" aria-hidden="true">${esc(ini(name))}</div><div class="pi"><h1>${esc(name)}</h1><span class="muted">${esc(m==='s'?'Screened '+x.seeker.toLowerCase()+' · '+x.seekersList[0].city:x.cred+' · '+x.listings[0].city)}</span></div>
+  <div class="gc"><span class="ok">Google Calendar connected</span><span class="muted">${esc(email(name))}</span><a class="ghost sm lnk" href="https://calendar.google.com/calendar/r" target="_blank" rel="noopener">Open Google Calendar</a></div></div>
+  <p class="note" style="margin-bottom:20px">Every meeting you agree on in Tulay shows up here and in your Google Calendar. Reschedules and cancellations update both.</p>
+  <div class="calwrap"><div class="panel"><div class="calhead"><button class="ghost sm" data-act="calprev" aria-label="Previous month">‹</button><h2>${mo.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</h2><button class="ghost sm" data-act="calnext" aria-label="Next month">›</button></div>
+  <div class="cal">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div>
+  <div class="row muted calkey"><span><i class="k set"></i>Set</span><span><i class="k tent"></i>Proposed</span><span><i class="k met"></i>Met</span><span><i class="k off"></i>Missed, cancelled or moved</span></div></div>
+  <div><h2 class="sh">Coming up</h2>${up.length?up.map(evCard).join(''):'<p class="muted">Nothing scheduled.</p>'}<h2 class="sh" style="margin-top:20px">History</h2>${past.length?past.map(evCard).join(''):'<p class="muted">No finished meetings yet.</p>'}</div></div>
+  <p class="sample">Sample people and meetings. In the live app, "Open in Google Calendar" opens the event Tulay already added; here it opens a pre-filled copy you can save.</p>`;
+}
+function post(){
+  const x=v(),d=D(),my=d.listings.filter(l=>l.by===meP());
+  const msgs=l=>d.threads.filter(t=>t.about===l.title&&t.p===meP()).length;
+  return `<div class="head"><h1>My listings</h1><span class="muted">Signed in as ${esc(meP())}, ${esc(x.cred.toLowerCase())}</span></div>
+  <div class="two"><form class="legend" id="pf" novalidate>
+   <h2 style="font-size:22px">Post a listing</h2>
+   <label for="ptitle">Title<input id="ptitle" maxlength="80" placeholder="What you offer, in one line"></label>
+   <label for="pcat">Category<select id="pcat">${x.cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select></label>
+   <label for="pprice">Price in ₱${x.unit?' ('+esc(x.unit.trim())+')':''}<input id="pprice" type="number" min="0" step="50" inputmode="numeric" placeholder="0 for free"></label>
+   <label for="pcity">City<select id="pcity">${Object.keys(CITIES).map(c=>`<option${c===x.listings[0].city?' selected':''}>${c}</option>`).join('')}</select></label>
+   <label for="pdesc">Description<textarea id="pdesc" maxlength="400" placeholder="Who it's for and what happens in the first meeting"></textarea></label>
+   <p class="muted" style="margin:0">Listings with guaranteed returns or recruitment pitches are removed. Don't put your number here; it's shared once a meeting is set.</p>
+   <div class="row"><button class="btn" type="submit">Post to feed</button><span class="muted" id="pmsg" role="status">${esc(S.flash)}</span></div>
+  </form><div class="mine">
+   <div class="legend"><b>Plan: ${S.premium?'Premium':'Free'}</b><span class="muted">Paying never changes where you appear in the feed.</span>
+   <div class="row" style="justify-content:space-between"><span>Clients you reached out to this month</span><span class="stat">${d.used}</span></div></div>
+   ${my.map(l=>`<div class="li"><b>${esc(l.title)}</b><span class="stat">${esc(peso(l))}</span><span class="stat">${l.views||0} views · ${msgs(l)} messages</span><span class="stat">${l.paused?'Paused':'Live · '+ago(l.h)}</span><button class="ghost" data-act="pause" data-id="${l.id}">${l.paused?'Resume':'Pause'}</button></div>`).join('')}
+  </div></div><p class="sample">Sample people and listings.</p>`;
+}
+/* advisor-side counterpart feed: opted-in client requests */
+const SLOTS=5;
+/* sample demand: client requests and searches in the last 7 days vs the 7 days before */
+const DEM=[['Health / HMO',52,44,'health cover'],['Education plan',46,31,'education plans'],['Retirement',38,35,'retirement planning'],['Life insurance',33,30,'life insurance'],['Investments',27,29,'investing help'],['VUL',19,10,'VUL reviews'],['Debt & budgeting',14,15,'debt and budgeting help']];
+const INS=[{cat:'VUL',t:'VUL second-opinion requests nearly doubled',s:'19 this week, up from 10. Most clients want to know whether to keep, reduce or surrender a policy they already have.'},{cat:'Health / HMO',t:'Health cover is still what clients ask for most',s:'52 requests this week. Many are adult children looking for cover for parents in their 60s.'},{cat:'Retirement',t:'Retirement questions are coming from older employees',s:'Most retirement requests this week came from employees in their 40s and 50s asking if SSS or GSIS is enough.'}];
+const chg=(a,b)=>Math.round((a-b)/b*100);
+Object.assign(IC,{trend:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>',crown:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 8l4.6 3.6L12 5l4.4 6.6L21 8l-1.8 9.5H4.8z"/><rect x="4.8" y="18.7" width="14.4" height="2" rx="1"/></svg>'});
+function demand(){
+  const top=DEM.filter(d=>d[1]>=20).sort((a,b)=>chg(b[1],b[2])-chg(a[1],a[2]))[0],max=Math.max(...DEM.map(d=>d[1]));
+  return `<section class="dem" aria-labelledby="demh"><div class="dem-h"><span class="dem-i">${IC.trend}</span><div><span class="kick">What clients are looking for</span><h2 id="demh">Recently, clients have been looking for ${esc(top[3])}</h2><p class="muted">${esc(top[0])} requests are up ${chg(top[1],top[2])}% this week (${top[1]}, up from ${top[2]}). Client requests and searches in the last 7 days. Tap a category to see its requests.</p></div></div>
+  <ul class="dem-l">${[...DEM].sort((a,b)=>b[1]-a[1]).map(([c,a,b])=>{const p=chg(a,b);return `<li><button type="button" data-act="dcat" data-c="${esc(c)}" aria-pressed="${S.ccat===c}"><span>${esc(c)}</span><span class="db"><i style="width:${a/max*100}%"></i></span><span class="dv">${a}</span><span class="dc ${p>0?'up':'down'}">${p>0?'+':''}${p}%</span></button></li>`}).join('')}</ul></section>`;
+}
+const insCard=n=>`<article class="ins"><span class="dem-i">${IC.trend}</span><div><b>${esc(n.t)}</b><p>${esc(n.s)}</p><button type="button" class="ghost sm" data-act="dcat" data-c="${esc(n.cat)}">See ${esc(n.cat)} requests</button></div></article>`;
+const REQ={'Joanna R.':{h:30,ready:false,budget:'₱1,500 to ₱3,000 a month',lang:'Filipino or English',mode:'Google Meet',resp:2},
+ 'Mark L.':{h:3,ready:true,budget:'About ₱1,000 a month',lang:'English',mode:'Google Meet',resp:1},
+ 'Bea S.':{h:8,ready:true,budget:'₱5,000 a month to invest',lang:'English or Taglish',mode:'Google Meet',resp:3},
+ 'Carlo D.':{h:52,ready:false,budget:'No budget yet',lang:'Filipino',mode:'In person',resp:1},
+ 'Rina T.':{h:20,ready:true,budget:'₱2,500 a month',lang:'English',mode:'In person',resp:4},
+ 'Jessa M.':{h:5,ready:true,budget:'₱4,000 a month for both parents',lang:'Cebuano or English',mode:'Google Meet',resp:0},
+ 'Kim A.':{h:1,ready:true,budget:'About ₱1,200 a month',lang:'Filipino',mode:'Google Meet',resp:0},
+ 'Noel V.':{h:12,ready:false,budget:'₱3,000 a month',lang:'English',mode:'In person',resp:2},
+ 'Aira S.':{h:40,ready:false,budget:'₱2,000 a month',lang:'Taglish',mode:'Google Meet',resp:5},
+ 'Lito B.':{h:16,ready:true,budget:'₱2,500 a month',lang:'Filipino',mode:'Google Meet',resp:1}};
+Object.assign(IC,{peso:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 20V4h5a4 4 0 0 1 0 8H8M5 8h14M5 11h14"/></svg>',chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>',people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 4.5a3 3 0 0 1 0 7M18 14a5 5 0 0 1 3 6"/></svg>'});
+function clients(){
+  const x=v(),P=x.seekers.toLowerCase(),home=x.listings[0].city;
+  const radio=(name,val,cur,label)=>`<label><input type="radio" name="${name}" value="${esc(val)}"${String(cur)===String(val)?' checked':''}> ${esc(label)}</label>`;
+  return `<div class="tt"><button class="ghost fbtn" data-act="filters" aria-expanded="${!!S.showF}" aria-controls="side">Filters</button>
+  <aside class="side${S.showF?' open':''}" id="side" aria-label="Filters"><h2>Client requests</h2>
+   <fieldset><legend>Looking for help with</legend>${['',...x.cats].map(c=>radio('ccat',c,S.ccat,c||'All categories')).join('')}</fieldset>
+   <fieldset><legend>How far from ${esc(home)}?</legend>${[[5,'Within 5 km'],[10,'Within 10 km'],[25,'Within 25 km'],[0,'Anywhere in PH']].map(([k,l])=>radio('crad',k,S.crad,l)).join('')}</fieldset>
+   <fieldset><legend>Readiness</legend>${radio('cready','',S.cready,'Any')}${radio('cready','ready',S.cready,'Ready within 30 days')}</fieldset>
+   <fieldset><legend>Sort by</legend>${radio('csort','match',S.csort,'Best match for your listings')}${radio('csort','new',S.csort,'Newest first')}${radio('csort','near',S.csort,'Nearest first')}</fieldset>
+   <div class="optbox"><b>How this feed works</b><span class="muted">Only screened ${esc(P)} who turned on “let advisors reach out” appear here. You see a first name, city and what they need, never a number. Up to ${SLOTS} advisors can answer each request.</span></div>
+  </aside><section class="feedcol${S.lay==='grid'?' wide':''}"><div class="res-head"><h1>${esc(x.seekers)} looking for help</h1><div class="crit-row"><button class="crit" type="button" data-tip="Best match puts requests in your listings’ categories first, then the newest. Your plan never changes which requests you see.">Our criteria <i aria-hidden="true">i</i></button><span class="muted" id="ch"></span></div></div><div id="cfeed"></div>
+  <p class="sample">Sample people and requests. Signed in as ${esc(meP())}.</p></section></div>`;
+}
+function cfeed(){
+  const x=v(),d=D(),home=x.listings[0].city,mine=new Set(d.listings.filter(l=>l.by===meP()&&!l.paused).map(l=>l.cat));
+  const list=x.seekersList.filter(s=>s.name!==meS()||S.optIn).map(s=>{const r=REQ[s.name]||{h:24,ready:false,budget:'',lang:'',mode:'',resp:0},t=d.threads.find(t=>t.p===meP()&&t.s===s.name);return {...s,...r,k:km(home,s.city),t,m:s.wants.some(w=>mine.has(w))?1:0,n:r.resp+(t?1:0)}})
+   .filter(s=>(!s.t||!['declined','reported'].includes(s.t.status))&&(!S.crad||s.k<=S.crad)&&(!S.ccat||s.wants.includes(S.ccat))&&(!S.cready||s.ready));
+  list.sort(S.csort==='near'?(a,b)=>a.k-b.k||a.h-b.h:S.csort==='new'?(a,b)=>a.h-b.h:(a,b)=>(b.m-a.m)||a.h-b.h);
+  $('#ch').textContent=`${list.length} ${S.crad?'within '+S.crad+' km':'across the Philippines'}`;
+  $('#cfeed').innerHTML=demand()+(list.length?`<div class="pros${S.lay==='grid'?' g':''}">${list.map((s,i)=>{const full=s.n>=SLOTS&&!s.t,ins=INS.filter(n=>n.cat!==S.ccat),k=i/3-1;
+   return (i&&i%3===0&&ins[k]?insCard(ins[k]):'')+`<article class="pro"><div class="big c${hue(s.name)}" aria-hidden="true">${esc(ini(s.name))}</div><div>
+   <h3>${esc(s.name)}</h3>
+   <div class="rate">${s.m?'<span class="topb"><i aria-hidden="true">✓</i>Matches your listings</span>':''}<span class="muted">Screened by Tulay · posted ${ago(s.h)}</span></div>
+   <div class="pills">${s.wants.map(w=>`<span class="pill${mine.has(w)?'':' c'}">${esc(w)}</span>`).join('')}</div>
+   <ul class="facts"><li><span class="dot${s.ready?'':' off'}" aria-hidden="true"></span><b>${s.ready?'Ready to decide within 30 days':'Still exploring options'}</b></li>
+   ${s.budget?`<li>${IC.peso}<span>${esc(s.budget)}</span></li>`:''}
+   <li>${IC.pin}<span>${esc(s.city)} · ${s.k<1?'your city':Math.round(s.k)+' km away'}</span></li>
+   ${s.mode?`<li>${IC.chat}<span>${esc(s.mode)} · ${esc(s.lang)}</span></li>`:''}
+   <li>${IC.people}<span>${S.premium?(s.n===0?'No advisors have responded yet':s.n===1?'<b>1</b> advisor has responded':`<b>${s.n}</b> advisors have responded`):`<span class="blur" aria-hidden="true">${hue(s.name)*3+2}</span><span class="sr">Hidden.</span> advisors have responded <span class="lock" tabindex="0" data-tip="Premium shows how many advisors have responded" aria-label="Premium shows how many advisors have responded">${IC.crown}</span>`}</span></li></ul></div>
+   <div class="pro-foot"><p class="quote"><span class="q">${esc(first(s.name))}’s request: “${esc(s.note)}”</span></p>
+   <div class="acts">${s.t?`<button class="ghost" data-act="open" data-id="${s.t.id}">Contacted · open chat</button>`:full?'<button class="btn" disabled>Request is full</button>':`<button class="btn" data-act="reach" data-n="${esc(s.name)}">Reach out</button>`}</div></div></article>`}).join('')}</div>`:`<div class="empty">No ${esc(x.seekers.toLowerCase())} match these filters. Try a wider distance or another category.</div>`);
+}
+
+/* ---------- analytics ---------- */
+const liveRows=()=>{const d=D();return d.threads.map(t=>{
+  const l=d.listings.find(l=>l.title===t.about&&l.by===t.p)||d.listings.find(l=>l.by===t.p)||{city:'Quezon City',cat:''};
+  const replied=t.kind==='outreach'?!['pending','declined'].includes(t.status):t.msgs.some(m=>m.f==='p');
+  return {p:t.p,title:t.kind==='inquiry'?t.about:'',city:l.city,cat:t.kind==='outreach'?(t.about.split(', ')[0]||l.cat):l.cat,kind:t.kind,replied,replyH:replied?.5:null,proposed:t.log.proposed,set:t.log.set,outcome:t.log.outcome,sat:t.log.sat,resched:t.log.resched,auto:!!t.log.auto,live:true,t};
+})};
+const allRows=()=>D().hist.concat(liveRows());
+function metrics(rows){
+  const c=f=>rows.filter(f).length,out=rows.filter(r=>r.kind==='outreach'),hs=rows.filter(r=>r.replyH!=null).map(r=>r.replyH).sort((a,b)=>a-b);
+  return {conv:rows.length,resp:c(r=>r.replied),prop:c(r=>r.proposed),set:c(r=>r.set),met:c(r=>r.outcome==='met'),sat:c(r=>r.sat==='yes'),fb:c(r=>r.sat),auto:c(r=>r.auto),done:c(r=>r.outcome),miss:c(r=>r.outcome==='noshow'),disp:c(r=>r.outcome==='disputed'),fast:c(r=>r.replied&&r.replyH<=24),out:out.length,outAcc:out.filter(r=>r.replied).length,med:hs.length?hs[Math.floor(hs.length/2)]:null,resched:rows.reduce((a,r)=>a+r.resched,0)};
+}
+const pc=(a,b)=>b?Math.round(a/b*100)+'%':'–';
+const fmtH=h=>h==null?'–':h<1?Math.round(h*60)+' min':h.toFixed(1)+' h';
+const tile=(n,l,s)=>`<div class="tile"><b>${n}</b><span>${esc(l)}</span>${s?`<small>${esc(s)}</small>`:''}</div>`;
+function funnel(m){
+  const steps=[['Conversations started',m.conv],['Got a response',m.resp],['Meeting proposed',m.prop],['Meeting set, numbers shared',m.set],['Both confirmed they met',m.met],['Client said they got help',m.sat]];
+  return `<ol class="fun">${steps.map(([l,n],i)=>{const prev=i?steps[i-1][1]:n,w=m.conv?n/m.conv*100:0,step=pc(n,prev);
+    return `<li tabindex="0" data-tip="${esc(l)}: ${n}${i?` · ${step} of the step before · ${pc(n,m.conv)} of all conversations`:''}"><span>${esc(l)}</span><span class="fb"><i style="width:${w}%"></i></span><span class="fn"><b>${n}</b>${i?` <span class="muted">${step}</span>`:''}</span></li>`}).join('')}</ol>
+  <p class="muted" style="margin:0">Percentages are of the step before. Hover or tap a row for more.</p>`;
+}
+const tbl=(cols,rows,num)=>`<div class="scroll"><table class="stack"><thead><tr>${cols.map((c,i)=>`<th${i>=num?' class="num"':''}>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${esc(cols[i])}"${i>=num?' class="num"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+const groups=(rows,key)=>{const g={};rows.forEach(r=>(g[r[key]]??=[]).push(r));return Object.entries(g).map(([k,rs])=>[k,metrics(rs)]).sort((a,b)=>b[1].conv-a[1].conv)};
+const liveNote=rows=>{const n=rows.filter(r=>r.live).length;return `<p class="sample">Last 30 days. Sample history, plus ${n} conversation${n===1?'':'s'} you can change in this prototype's Messages.</p>`};
+function advStats(){
+  const x=v(),d=D(),rows=allRows().filter(r=>r.p===meP()),m=metrics(rows);
+  const lst=d.listings.filter(l=>l.by===meP()).map(l=>{const rs=rows.filter(r=>r.kind==='inquiry'&&r.title===l.title),mm=metrics(rs);return [esc(l.title),l.views||0,mm.conv,mm.set,mm.met,pc(mm.met,mm.done)]});
+  const ro=metrics(rows.filter(r=>r.kind==='outreach'));
+  return `<div class="head"><h1>Your results</h1><span class="muted">${esc(meP())}</span></div>
+  <p class="note" style="margin-bottom:20px">Only you and the Tulay team see these numbers. They never change where you appear in the feed.</p>
+  <div class="tiles">${tile(m.met,'Successful appointments','Both of you confirmed you met')}${tile(pc(m.met,m.done),'Show-up rate',`Of ${m.done} meetings whose time has passed`)}${tile(fmtH(m.med),'Typical first reply','Median time to answer a new inquiry')}${tile(pc(m.sat,m.fb),'Clients who got help',`Of ${m.fb} follow-up answers`)}</div>
+  <div class="panel"><h2>From first message to a meeting</h2>${funnel(m)}</div>
+  <div class="panel"><h2>By listing</h2>${tbl(['Listing','Views','Inquiries','Meetings set','Met','Show-up rate'],lst,1)}
+  <p class="muted" style="margin:0">Outreach you started: ${ro.conv} sent, ${pc(ro.resp,ro.conv)} accepted, ${ro.met} led to a confirmed meeting.</p></div>
+  ${liveNote(rows)}`;
+}
+function adminStats(){
+  const x=v(),d=D(),rows=allRows(),m=metrics(rows);
+  const row=([k,mm])=>[esc(k),mm.conv,pc(mm.fast,mm.conv),mm.set,mm.met,pc(mm.met,mm.done)];
+  const disp=liveRows().filter(r=>r.outcome==='disputed'),hd=D().hist.filter(r=>r.outcome==='disputed').length;
+  return `<div class="head"><h1>Marketplace health</h1><span class="muted">${esc(x.name)} · Tulay team only</span></div>
+  <div class="tiles">${tile(m.met,'Successful appointments','Both sides confirmed they met')}${tile(pc(m.met,m.done),'Show-up rate',`${m.miss} missed, ${m.disp} disputed, of ${m.done} past meetings`)}${tile(pc(m.fast,m.conv),'Answered within 24 h','Share of all conversations')}${tile(pc(m.outAcc,m.out),'Outreach accepted',`Of ${m.out} reach-outs`)}${tile(pc(m.auto,m.met),'Confirmed by Google Meet','Successful appointments where Meet showed both joined')}${tile(m.set-m.done,'Meetings coming up','Set, not yet checked in')}${tile(m.resched,'Reschedules','Said "we rescheduled" at check-in')}</div>
+  <div class="panel"><h2>From first message to a meeting</h2>${funnel(m)}</div>
+  <div class="panel"><h2>By city</h2><p class="muted" style="margin:0">Use this to decide when a city has enough ${esc(x.providers.toLowerCase())} to expand.</p>${tbl(['City','Conversations','Answered in 24 h','Meetings set','Met','Show-up rate'],groups(rows,'city').map(row),1)}</div>
+  <div class="panel"><h2>By category</h2>${tbl(['Category','Conversations','Answered in 24 h','Meetings set','Met','Show-up rate'],groups(rows,'cat').map(row),1)}</div>
+  <div class="panel"><h2>Check-ins to review</h2><p class="muted" style="margin:0">One side said they met, the other said no-show.</p>
+  ${disp.length?`<ul style="margin:0;padding-left:20px">${disp.map(r=>`<li>${esc(r.t.s)} and ${esc(r.t.p)}: ${esc(r.t.about)}</li>`).join('')}</ul>`:''}
+  <p style="margin:0">${disp.length?`Plus ${hd} from sample history.`:`${hd} from sample history. None from your testing yet.`}</p></div>
+  ${liveNote(rows)}`;
+}
+
+/* ---------- modals ---------- */
+function modal(kind,target){
+  S.modal={kind,target};
+  if(kind==='multi'){$('#mt').textContent=`Message your top ${target.length} matches`;$('#mnote').textContent=`Sends this to ${target.map(l=>l.by).join(', ')}. Each gets their own conversation.`;$('#mtext').value=`Hi, I'm looking for help with ${(S.cat||target[0].cat).toLowerCase()}. Are you free for a first meeting? `}
+  else if(kind==='msg'){$('#mt').textContent='Message '+target.by;$('#mnote').textContent='About: '+target.title;$('#mtext').value=`Hi ${first(target.by)}, I saw your listing "${target.title}". `}
+  else{$('#mt').textContent='Reach out to '+target.name;$('#mnote').textContent=`Up to ${SLOTS} advisors can answer each request. ${first(target.name)} must accept before you can send more.`;$('#mtext').value=`Hi ${first(target.name)}, I saw you're looking for help with ${target.wants[0].toLowerCase()}. `}
+  $('#modal').hidden=false;$('#mtext').focus();
+}
+function closeModal(){$('#modal').hidden=true;S.modal=null}
+const blank=o=>({...o,appt:null,past:[],unlocked:false,log:{proposed:false,set:false,outcome:null,sat:null,resched:0,followup:false,auto:false}});
+function send(){
+  const raw=$('#mtext').value.trim();if(!raw||!S.modal)return;
+  const d=D(),{kind,target}=S.modal,txt=mask(raw);let t;
+  if(kind==='multi'){let f=null;target.forEach(l=>{let x=d.threads.find(t=>t.p===l.by&&t.s===meS()&&t.about===l.title);if(!x){x=blank({id:'t'+tick,p:l.by,s:meS(),kind:'inquiry',about:l.title,status:'open',msgs:[]});d.threads.push(x)}x.msgs.push({f:'s',t:x.unlocked?raw:txt});if(!x.unlocked&&txt!==raw)x.msgs.push({f:'x',t:'Numbers and emails are hidden until you both agree on a meeting.'});x.ts=tick++;f=f||x});if(f)S.open=f.id;closeModal();location.hash='inbox';render();return}
+  if(kind==='msg'){t=d.threads.find(t=>t.p===target.by&&t.s===meS()&&t.about===target.title);if(!t){t=blank({id:'t'+tick,p:target.by,s:meS(),kind:'inquiry',about:target.title,status:'open',msgs:[]});d.threads.push(t)}t.msgs.push({f:'s',t:t.unlocked?raw:txt})}
+  else{t=blank({id:'t'+tick,p:meP(),s:target.name,kind:'outreach',about:target.wants.join(', '),status:'pending',msgs:[{f:'p',t:txt}]});d.threads.push(t);d.used++}
+  if(!t.unlocked&&txt!==raw)t.msgs.push({f:'x',t:'Numbers and emails are hidden until you both agree on a meeting.'});
+  t.ts=tick++;S.open=t.id;closeModal();location.hash='inbox';render();
+}
+const thread=()=>D().threads.find(t=>t.id===S.open);
+const sys=(t,m)=>{t.msgs.push({f:'x',t:m});t.ts=tick++};
+function openAppt(t,as,counter){
+  S.amodal={as,counter};const a=counter&&t.appt,base=a?t.appt.at:dayAt(2,10);
+  $('#at').textContent=a?(t.appt.status==='confirmed'?'Reschedule the meeting':'Suggest another time'):'Propose a meeting';
+  $('#anote').textContent=`With ${nm(t,as==='s'?'p':'s')}`+(as!==me()?`. Prototype: you're acting as ${nm(t,as)}.`:'');
+  $('#adate').value=ymd(base);$('#adate').min=ymd(NOW);$('#atime').value=pad(base.getHours())+':'+pad(base.getMinutes());
+  $('#amode').value=a?t.appt.mode:'Google Meet';$('#adur').value=String(a?t.appt.dur:60);$('#awhere').value=a?t.appt.where:'';$('#aerr').textContent='';syncWhere();
+  $('#amodal').hidden=false;$('#adate').focus();
+}
+function syncWhere(){const meet=$('#amode').value==='Google Meet';$('#awrap').hidden=meet;$('#ameet').hidden=!meet}
+function closeAppt(){$('#amodal').hidden=true;S.amodal=null}
+
+document.addEventListener('click',e=>{
+  if(S.prof&&e.target.closest('#tabs a,.brand')){S.prof=null;setTimeout(render)}
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,d=D();
+  if(a==='role'){S.prof=null;S.role=b.dataset.r;S.open=null;S.flash='';location.hash=TABS[S.role][0][0];render();return}
+  if(a==='cat'){S.cat=b.dataset.c;document.querySelectorAll('[data-act=cat]').forEach(c=>c.setAttribute('aria-pressed',c===b));feed();return}
+  if(a==='prof'){S.prof=b.dataset.n;render();scrollTo(0,0);return}
+  if(a==='unprof'){S.prof=null;render();return}
+  if(a==='prem'){S.premium=!S.premium;render();return}
+  if(a==='dcat'){S.ccat=S.ccat===b.dataset.c?'':b.dataset.c;render();return}
+  if(a==='lay'){S.lay=b.dataset.v;render();return}
+  if(a==='more'){const p=b.closest('.quote'),o=p.classList.toggle('open');b.textContent=o?'See less':'See more';b.setAttribute('aria-expanded',o);return}
+  if(a==='filters'){S.showF=!S.showF;$('#side').classList.toggle('open',S.showF);b.setAttribute('aria-expanded',S.showF);return}
+  if(a==='top4'){if(S.top&&S.top.length)modal('multi',S.top);return}
+  if(a==='save'){const id=b.dataset.id;d.saved.has(id)?d.saved.delete(id):d.saved.add(id);S.prof?render():feed();return}
+  if(a==='msg'){modal('msg',d.listings.find(l=>l.id===b.dataset.id));return}
+  if(a==='reach'){modal('reach',v().seekersList.find(s=>s.name===b.dataset.n));return}
+  if(a==='msend'){send();return}
+  if(a==='mclose'){closeModal();return}
+  if(a==='aclose'){closeAppt();return}
+  if(a==='calprev'||a==='calnext'){S.calMonth=new Date(S.calMonth.getFullYear(),S.calMonth.getMonth()+(a==='calnext'?1:-1),1);render();return}
+  if(a==='open'){S.open=b.dataset.id;if(location.hash!=='#inbox'){location.hash='inbox'}else render();return}
+  if(a==='pause'){const l=d.listings.find(l=>l.id===b.dataset.id);l.paused=!l.paused;S.flash='';render();return}
+  const t=thread();if(!t)return;
+  const as=b.dataset.as||me(),who=nm(t,as);
+  if(a==='propose'||a==='acounter'){openAppt(t,as,a==='acounter');return}
+  if(a==='accept'){t.status='open';sys(t,`${t.s} accepted. You can both write now.`)}
+  if(a==='decline'){t.status='declined';sys(t,`${t.s} declined. ${t.p} can't message again.`)}
+  if(a==='report'){t.status='reported';sys(t,`${S.role==='seeker'?t.s:t.p} reported this conversation to the moderation team.`)}
+  if(a==='reply'){const r=$('#reply').value.trim();if(!r)return;const txt=t.unlocked?r:mask(r);t.msgs.push({f:me(),t:txt});t.ts=tick++;if(txt!==r)sys(t,'Numbers and emails are hidden until you both agree on a meeting.')}
+  if(a==='aaccept'&&t.appt){const firstTime=!t.unlocked,ap=t.appt;ap.status='confirmed';if(ap.mode==='Google Meet')ap.meet=meetCode(t.id+ap.at.getTime());t.log.set=true;t.unlocked=true;
+    sys(t,`${who} accepted. Meeting set for ${fmtWhen(ap.at)}. ${ap.upd?'Both Google Calendar invites were updated':'Google Calendar invites'+(ap.meet?' with a Google Meet link':'')+' were sent to both of you'}.${firstTime?' Your numbers are now shared with each other.':''}`)}
+  if(a==='adecline'&&t.appt){t.appt=null;sys(t,`${who} declined that time.`)}
+  if(a==='acancel'&&t.appt){const was=t.appt.status;if(was==='confirmed'){finish(t,'cancelled');sys(t,`${who} cancelled the meeting. It was removed from both Google Calendars.`)}else{t.appt=null;sys(t,`${who} withdrew the proposal.`)}}
+  if(a==='askip'&&t.appt){const ap=t.appt,att=b.dataset.v;
+    if(att==='both'){ap.att='both';t.log.outcome='met';t.log.auto=true;finish(t,'met');sys(t,`Google Meet shows you both joined (${first(t.s)} at ${tm(new Date(ap.at.getTime()-120000))}, ${first(t.p)} at ${tm(new Date(ap.at.getTime()+60000))}). Counted as a successful appointment with no check-in needed.`)}
+    else if(att){ap.att=att;ap.due=true;sys(t,`Google Meet shows ${attTxt(t,att)}. Both of you are asked what happened.`)}
+    else{ap.due=true;sys(t,'Prototype: the meeting time has passed. Both of you are asked whether you met.')}}
+  if(a==='ans'&&t.appt){
+    const ap=t.appt,val=b.dataset.v;ap.ans[as]=val;
+    if(val==='resched'){t.log.resched++;finish(t,'resched');sys(t,`${who} said you rescheduled. Propose the new time here so it stays on record.`)}
+    else{sys(t,`${who} answered the check-in.`);const x=ap.ans.s,y=ap.ans.p;
+      if(x&&y){const oc=x==='met'&&y==='met'?'met':(x==='met'||y==='met')?'disputed':'noshow';if(t.log.outcome!=='met')t.log.outcome=oc;finish(t,oc);
+        sys(t,oc==='met'?'You both confirmed you met. This counts as a successful appointment.':oc==='disputed'?"Your answers don't match, so the Tulay team will look into it.":'Neither of you confirmed the meeting. Recorded as missed.')}}
+  }
+  if(a==='askip2'){t.log.followup=true;sys(t,`Prototype: two weeks later. ${t.s} is asked whether they got the help they needed.`)}
+  if(a==='sat'){t.log.sat=b.dataset.v;sys(t,`${t.s} answered the follow-up.`)}
+  render();
+});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;if(S.prof){S.prof=null;render()}else feed()}});
+document.addEventListener('change',e=>{
+  const id=e.target.id,val=e.target.value;
+  if(id==='city'){S.city=val;render()}
+  if(e.target.name==='fcat'){S.cat=val;feed()}
+  if(e.target.name==='ccat'){S.ccat=val;cfeed()}
+  if(e.target.name==='crad'){S.crad=+val;cfeed()}
+  if(e.target.name==='cready'){S.cready=val;cfeed()}
+  if(e.target.name==='csort'){S.csort=val;cfeed()}
+  if(e.target.name==='frad'){S.radius=+val;feed()}
+  if(e.target.name==='fsort'){S.sort=val;feed()}
+  if(id==='radius'){S.radius=+val;feed()}
+  if(id==='sort'){S.sort=val;feed()}
+  if(id==='saved'){S.savedOnly=e.target.checked;feed()}
+  if(id==='optin'){S.optIn=e.target.checked;header()}
+  if(id==='amode')syncWhere();
+});
+document.addEventListener('submit',e=>{
+  if(e.target.id==='sbar'){e.preventDefault();S.q=$('#q').value;S.prof=null;render();return}
+  if(e.target.id==='af'){
+    e.preventDefault();const t=thread();if(!t||!S.amodal)return;const {as,counter}=S.amodal;
+    const dv=$('#adate').value,tv=$('#atime').value;
+    if(!dv||!tv){$('#aerr').textContent='Pick a date and a time.';return}
+    const at=new Date(dv+'T'+tv);if(!(at>new Date())){$('#aerr').textContent='Pick a time in the future.';return}
+    const wasSet=t.appt&&t.appt.status==='confirmed',mode=$('#amode').value,dur=+$('#adur').value,w=mode==='In person'?$('#awhere').value.trim():'',where=t.unlocked?w:mask(w);
+    t.appt={by:as,at,dur,mode,where,status:'proposed',due:false,ans:{s:null,p:null},att:null,meet:null,upd:wasSet};t.log.proposed=true;
+    sys(t,`${nm(t,as)} ${wasSet?'asked to move the meeting to':counter?'suggested another time:':'proposed a meeting:'} ${whenTxt(t.appt)}.`);
+    closeAppt();render();return;
+  }
+  if(e.target.id!=='pf')return;e.preventDefault();
+  const title=$('#ptitle').value.trim(),price=$('#pprice').value,desc=$('#pdesc').value.trim(),msg=$('#pmsg');
+  if(!title||price===''||+price<0){msg.textContent='Add a title and a price (0 for free).';return}
+  const d=D();d.listings.unshift({id:'l'+tick++,by:meP(),yrs:v().listings[0].yrs,cat:$('#pcat').value,title,price:Math.round(+price),city:$('#pcity').value,desc:mask(desc)||'No description yet.',h:0,views:0});
+  S.flash=`Posted. It's now in the ${v().seeker.toLowerCase()} feed.`;render();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(S.modal)closeModal();if(S.amodal)closeAppt()}});
+const tip=$('#tip');
+const showTip=e=>{const el=e.target.closest&&e.target.closest('[data-tip]');if(!el){tip.hidden=true;return}tip.textContent=el.dataset.tip;tip.hidden=false;const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(innerWidth-w-8,Math.max(8,r.left+r.width/2-w/2))+'px';tip.style.top=(r.top-h-8<0?r.bottom+8:r.top-h-8)+'px'};
+document.addEventListener('mouseover',showTip);document.addEventListener('focusin',showTip);
+addEventListener('scroll',()=>{tip.hidden=true},{passive:true});
+addEventListener('hashchange',render);
+render();
+}
+</script>
+</body>
+</html>
